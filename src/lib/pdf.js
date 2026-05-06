@@ -4,7 +4,7 @@ import logoSrc from '../assets/logo.png'
 
 const TVA_RATE = 0.20
 
-export function generateDevisPDF({ devis, client, lignes, entreprise }) {
+export function generateDevisPDF({ devis, client, lignes, entreprise, logoBase64 }) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
   const pageW = doc.internal.pageSize.getWidth()
   const margin = 15
@@ -13,7 +13,7 @@ export function generateDevisPDF({ devis, client, lignes, entreprise }) {
   doc.setFillColor(37, 99, 235)
   doc.rect(0, 0, pageW, 38, 'F')
 
-  try { doc.addImage(logoSrc, 'PNG', margin, 7, 20, 20) } catch (_) {}
+  try { doc.addImage(logoBase64 || logoSrc, 'PNG', margin, 7, 20, 20) } catch (_) {}
 
   const textX = margin + 24
   doc.setFont('helvetica', 'bold')
@@ -152,7 +152,7 @@ export function generateDevisPDF({ devis, client, lignes, entreprise }) {
   return doc
 }
 
-export function generateFacturePDF({ facture, client, lignes, entreprise }) {
+export function generateFacturePDF({ facture, client, lignes, entreprise, logoBase64 }) {
   const doc   = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
   const pageW = doc.internal.pageSize.getWidth()
   const margin = 15
@@ -161,7 +161,7 @@ export function generateFacturePDF({ facture, client, lignes, entreprise }) {
   doc.setFillColor(37, 99, 235)
   doc.rect(0, 0, pageW, 38, 'F')
 
-  try { doc.addImage(logoSrc, 'PNG', margin, 7, 20, 20) } catch (_) {}
+  try { doc.addImage(logoBase64 || logoSrc, 'PNG', margin, 7, 20, 20) } catch (_) {}
 
   const textX = margin + 24
   doc.setFont('helvetica', 'bold')

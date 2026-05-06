@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Plus, Receipt, MoreHorizontal, Search, Download, Send, Pencil } from 'lucide-react'
+import { Plus, Receipt, MoreHorizontal, Search, Download, Send, Pencil, FileDown } from 'lucide-react'
 import ConfirmModal from '../../components/ui/ConfirmModal'
+import { exportFacturesCSV } from '../../lib/csv'
 import { supabase } from '../../lib/supabase'
-import { getEntrepriseData } from '../../lib/entreprise'
+import { getEntrepriseData, fetchLogoBase64 } from '../../lib/entreprise'
 import { generateFacturePDF, downloadPDF, getPDFBase64 } from '../../lib/pdf'
 import { sendFactureEmail } from '../../lib/email'
 import Badge from '../../components/ui/Badge'
@@ -73,8 +74,8 @@ export default function FactureListPage() {
       supabase.from('lignes_facture').select('*').eq('facture_id', f.id),
       getEntrepriseData(),
     ])
-
-    const doc = generateFacturePDF({ facture: f, client: f.clients, lignes: lignes || [], entreprise })
+    const logoBase64 = await fetchLogoBase64(entreprise?.logo_url)
+    const doc = generateFacturePDF({ facture: f, client: f.clients, lignes: lignes || [], entreprise, logoBase64 })
     downloadPDF(doc, `facture-${f.numero}.pdf`)
     toast.success('PDF téléchargé')
     setMenuOpen(null)
@@ -94,8 +95,8 @@ export default function FactureListPage() {
         supabase.from('lignes_facture').select('*').eq('facture_id', f.id),
         getEntrepriseData(),
       ])
-
-      const doc     = generateFacturePDF({ facture: f, client: f.clients, lignes: lignes || [], entreprise })
+      const logoBase64 = await fetchLogoBase64(entreprise?.logo_url)
+      const doc     = generateFacturePDF({ facture: f, client: f.clients, lignes: lignes || [], entreprise, logoBase64 })
       const pdf64   = getPDFBase64(doc)
 
       await sendFactureEmail({
@@ -171,6 +172,10 @@ export default function FactureListPage() {
             className="w-full h-8 pl-8 pr-3 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
         </div>
+
+        <Button size="sm" variant="secondary" onClick={() => exportFacturesCSV(filtered)} title="Exporter en CSV">
+          <FileDown size={14} /> CSV
+        </Button>
       </div>
 
       {loading ? (

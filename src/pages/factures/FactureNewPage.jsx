@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, Plus, Trash2, Eye } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
-import { getEntrepriseData } from '../../lib/entreprise'
+import { getEntrepriseData, fetchLogoBase64 } from '../../lib/entreprise'
 import { generateFacturePDF, downloadPDF } from '../../lib/pdf'
 import Button from '../../components/ui/Button'
 import Spinner from '../../components/ui/Spinner'
@@ -92,14 +92,12 @@ export default function FactureNewPage() {
   const totalTTC = totalHT + totalTVA
 
   async function handlePreview() {
-    const client   = clients.find(c => c.id === selectedClientId)
+    const client     = clients.find(c => c.id === selectedClientId)
     const entreprise = await getEntrepriseData()
-    const fakeFact = {
-      numero, created_at: new Date().toISOString(),
-      date_echeance: dateEcheance || null,
-    }
-    const lignesNum = lignes.map(l => ({ ...l, quantite: Number(l.quantite), pu_ht: Number(l.pu_ht) }))
-    const doc = generateFacturePDF({ facture: fakeFact, client: client || {}, lignes: lignesNum, entreprise })
+    const logoBase64 = await fetchLogoBase64(entreprise?.logo_url)
+    const fakeFact   = { numero, created_at: new Date().toISOString(), date_echeance: dateEcheance || null }
+    const lignesNum  = lignes.map(l => ({ ...l, quantite: Number(l.quantite), pu_ht: Number(l.pu_ht) }))
+    const doc = generateFacturePDF({ facture: fakeFact, client: client || {}, lignes: lignesNum, entreprise, logoBase64 })
     downloadPDF(doc, `apercu-${numero}.pdf`)
     toast.success('Aperçu PDF généré')
   }

@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Plus, Download, MoreHorizontal, FileText, Search, Pencil } from 'lucide-react'
+import { Plus, Download, MoreHorizontal, FileText, Search, Pencil, FileDown } from 'lucide-react'
 import ConfirmModal from '../ui/ConfirmModal'
 
 import { supabase } from '../../lib/supabase'
 import { generateDevisPDF, downloadPDF } from '../../lib/pdf'
-import { getEntrepriseData } from '../../lib/entreprise'
+import { getEntrepriseData, fetchLogoBase64 } from '../../lib/entreprise'
+import { exportDevisCSV } from '../../lib/csv'
 import Badge from '../ui/Badge'
 import Button from '../ui/Button'
 import Spinner from '../ui/Spinner'
@@ -75,8 +76,8 @@ export default function DevisList() {
       supabase.from('lignes_devis').select('*').eq('devis_id', d.id),
       getEntrepriseData(),
     ])
-
-    const doc = generateDevisPDF({ devis: d, client: d.clients, lignes: lignes || [], entreprise })
+    const logoBase64 = await fetchLogoBase64(entreprise?.logo_url)
+    const doc = generateDevisPDF({ devis: d, client: d.clients, lignes: lignes || [], entreprise, logoBase64 })
     downloadPDF(doc, `devis-${d.numero}.pdf`)
     toast.success('PDF téléchargé')
     setMenuOpen(null)
@@ -131,6 +132,10 @@ export default function DevisList() {
             className="w-full h-8 pl-8 pr-3 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
         </div>
+
+        <Button size="sm" variant="secondary" onClick={() => exportDevisCSV(filtered)} title="Exporter en CSV">
+          <FileDown size={14} /> CSV
+        </Button>
 
         <Link to="/devis/nouveau">
           <Button size="sm"><Plus size={14} /> Nouveau devis</Button>

@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Download, Send, Save, ChevronLeft } from 'lucide-react'
 import { generateDevisPDF, downloadPDF, getPDFBase64 } from '../../lib/pdf'
+import { getEntrepriseData, fetchLogoBase64 } from '../../lib/entreprise'
 import { sendDevisEmail } from '../../lib/email'
 import Button from '../ui/Button'
 import toast from 'react-hot-toast'
@@ -12,17 +13,26 @@ function euro(val) {
 }
 
 export default function StepPreview({ data, onBack, onSave, saving }) {
-  const [sending, setSending] = useState(false)
-  const { client, lignes = [], devisNumero } = data
+  const [sending, setSending]       = useState(false)
+  const [entreprise, setEntreprise] = useState(null)
+  const [logoBase64, setLogoBase64] = useState(null)
 
+  const { client, lignes = [], devisNumero } = data
   const totalHT  = lignes.reduce((s, l) => s + Number(l.quantite) * Number(l.pu_ht), 0)
   const totalTVA = totalHT * TVA_RATE
   const totalTTC = totalHT + totalTVA
 
-  const entreprise = {
+  useEffect(() => {
+    getEntrepriseData().then(async (e) => {
+      setEntreprise(e)
+      if (e?.logo_url) setLogoBase64(await fetchLogoBase64(e.logo_url))
+    })
+  }, [])
+
+  const ent = entreprise || {
     nom:     localStorage.getItem('cp_nom')     || 'Votre Entreprise',
     email:   localStorage.getItem('cp_email')   || '',
-    tel:     localStorage.getItem('cp_tel')      || '',
+    tel:     localStorage.getItem('cp_tel')     || '',
     adresse: localStorage.getItem('cp_adresse') || '',
     siret:   localStorage.getItem('cp_siret')   || '',
   }
@@ -32,7 +42,8 @@ export default function StepPreview({ data, onBack, onSave, saving }) {
       devis: { numero: devisNumero || 'BROUILLON', created_at: new Date() },
       client,
       lignes,
-      entreprise,
+      entreprise: ent,
+      logoBase64,
     })
   }
 
@@ -49,8 +60,8 @@ export default function StepPreview({ data, onBack, onSave, saving }) {
     }
     setSending(true)
     try {
-      const doc   = buildDoc()
-      const b64   = getPDFBase64(doc)
+      const doc = buildDoc()
+      const b64 = getPDFBase64(doc)
       await sendDevisEmail({
         to:          client.email,
         clientName:  client.nom,
@@ -59,7 +70,7 @@ export default function StepPreview({ data, onBack, onSave, saving }) {
       })
       toast.success(`Devis envoyé à ${client.email}`)
     } catch (err) {
-      toast.error(err.message || 'Erreur lors de l\'envoi')
+      toast.error(err.message || "Erreur lors de l'envoi")
     } finally {
       setSending(false)
     }
@@ -72,14 +83,15 @@ export default function StepPreview({ data, onBack, onSave, saving }) {
         <p className="text-sm text-gray-500 mt-1">Votre devis est prêt. Enregistrez, téléchargez ou envoyez-le.</p>
       </div>
 
-      {/* Preview card */}
       <div className="card p-6 space-y-5 font-sans">
-        {/* Header */}
         <div className="flex justify-between items-start pb-4 border-b border-gray-200">
-          <div>
-            <p className="text-lg font-bold text-gray-900">{entreprise.nom}</p>
-            {entreprise.adresse && <p className="text-xs text-gray-500 mt-0.5">{entreprise.adresse}</p>}
-            {entreprise.email   && <p className="text-xs text-gray-500">{entreprise.email}</p>}
+          <div className="flex items-center gap-3">
+            {logoBase64 && <img src={logoBase64} alt="logo" className="w-10 h-10 object-contain rounded" />}
+            <div>
+              <p className="text-lg font-bold text-gray-900">{ent.nom}</p>
+              {ent.adresse && <p className="text-xs text-gray-500 mt-0.5">{ent.adresse}</p>}
+              {ent.email   && <p className="text-xs text-gray-500">{ent.email}</p>}
+            </div>
           </div>
           <div className="text-right">
             <p className="text-2xl font-bold text-primary-600">DEVIS</p>
@@ -90,7 +102,6 @@ export default function StepPreview({ data, onBack, onSave, saving }) {
           </div>
         </div>
 
-        {/* Client */}
         <div className="bg-gray-50 rounded-lg p-3">
           <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Destinataire</p>
           <p className="font-medium text-gray-900">{client?.nom}</p>
@@ -98,7 +109,6 @@ export default function StepPreview({ data, onBack, onSave, saving }) {
           {client?.email   && <p className="text-xs text-gray-600">{client.email}</p>}
         </div>
 
-        {/* Articles */}
         <table className="w-full text-sm border-collapse">
           <thead>
             <tr className="bg-primary-600">
@@ -120,7 +130,6 @@ export default function StepPreview({ data, onBack, onSave, saving }) {
           </tbody>
         </table>
 
-        {/* Totaux */}
         <div className="flex justify-end">
           <div className="w-56 space-y-1.5">
             <div className="flex justify-between text-sm text-gray-600">
@@ -139,28 +148,17 @@ export default function StepPreview({ data, onBack, onSave, saving }) {
         <p className="text-xs text-gray-400 italic">Devis valable 30 jours à compter de la date d'émission.</p>
       </div>
 
-      {/* Actions */}
       <div className="flex flex-wrap gap-3 pt-2 border-t border-gray-100">
         <Button type="button" variant="secondary" onClick={onBack}>
           <ChevronLeft size={15} /> Retour
         </Button>
-
         <div className="flex-1" />
-
         <Button variant="secondary" onClick={handleDownload}>
           <Download size={15} /> Télécharger PDF
         </Button>
-
-        <Button
-          variant="outline"
-          onClick={handleSendEmail}
-          loading={sending}
-          disabled={!client?.email}
-          title={!client?.email ? 'Renseignez l\'email du client' : ''}
-        >
+        <Button variant="outline" onClick={handleSendEmail} loading={sending} disabled={!client?.email}>
           <Send size={15} /> Envoyer par email
         </Button>
-
         <Button onClick={onSave} loading={saving}>
           <Save size={15} /> Enregistrer le devis
         </Button>
