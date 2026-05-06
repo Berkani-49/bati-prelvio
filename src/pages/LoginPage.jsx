@@ -108,8 +108,7 @@ export default function LoginPage() {
 
         {/* Logo */}
         <div className="relative">
-          <img src="/logo.png" alt="Bati Prelvio" className="w-28 h-28 object-contain" />
-          <p className="text-gray-400 text-sm mt-3 font-medium tracking-wide uppercase">Bati Prelvio</p>
+          <img src="/logo.png" alt="Bati Prelvio" className="w-44 h-44 object-contain" />
         </div>
 
         {/* Titre */}
