@@ -1,0 +1,120 @@
+import { useState, useEffect } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
+import { supabase } from '../../lib/supabase'
+import { useAuth } from '../../hooks/useAuth'
+import DevisForm from '../../components/devis/DevisForm'
+import toast from 'react-hot-toast'
+
+async function generateNumero() {
+  const year  = new Date().getFullYear()
+  const month = String(new Date().getMonth() + 1).padStart(2, '0')
+
+  const { count } = await supabase
+    .from('devis')
+    .select('*', { count: 'exact', head: true })
+
+  const seq = String((count || 0) + 1).padStart(3, '0')
+  return `DEV-${year}${month}-${seq}`
+}
+
+export default function DevisNewPage() {
+  const { user }            = useAuth()
+  const navigate            = useNavigate()
+  const [saving, setSaving] = useState(false)
+  const [numero, setNumero] = useState('')
+
+  useEffect(() => {
+    generateNumero().then(setNumero)
+  }, [])
+
+  async function handleSave(data) {
+    setSaving(true)
+    try {
+      const { client, lignes = [], totalHT, totalTVA, totalTTC } = data
+
+      // Upsert client
+      let clientId = client.id
+      if (!clientId) {
+        const { data: newClient, error: cErr } = await supabase
+          .from('clients')
+          .insert({
+            nom:     client.nom,
+            email:   client.email || null,
+            tel:     client.tel   || null,
+            adresse: client.adresse || null,
+            user_id: user.id,
+          })
+          .select()
+          .single()
+        if (cErr) throw cErr
+        clientId = newClient.id
+      }
+
+      // Recalcul totaux
+      const ht  = lignes.reduce((s, l) => s + Number(l.quantite) * Number(l.pu_ht), 0)
+      const tva = ht * 0.20
+      const ttc = ht + tva
+
+      // Créer devis
+      const { data: devis, error: dErr } = await supabase
+        .from('devis')
+        .insert({
+          user_id:   user.id,
+          client_id: clientId,
+          numero:    numero,
+          statut:    'brouillon',
+          total_ht:  Number(ht.toFixed(2)),
+          total_tva: Number(tva.toFixed(2)),
+          total_ttc: Number(ttc.toFixed(2)),
+        })
+        .select()
+        .single()
+      if (dErr) throw dErr
+
+      // Insérer lignes
+      const lignesInsert = lignes.map(l => ({
+        devis_id:    devis.id,
+        designation: l.designation,
+        quantite:    Number(l.quantite),
+        pu_ht:       Number(l.pu_ht),
+        total_ht:    Number((l.quantite * l.pu_ht).toFixed(2)),
+      }))
+      const { error: lErr } = await supabase.from('lignes_devis').insert(lignesInsert)
+      if (lErr) throw lErr
+
+      toast.success(`Devis ${numero} enregistré !`)
+      navigate('/devis')
+    } catch (err) {
+      console.error(err)
+      toast.error(err.message || 'Erreur lors de l\'enregistrement')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className="p-6 max-w-2xl space-y-6">
+      <div className="flex items-center gap-3">
+        <Link
+          to="/devis"
+          className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
+        >
+          <ArrowLeft size={18} />
+        </Link>
+        <div>
+          <h1 className="text-xl font-bold text-gray-900">Nouveau devis</h1>
+          {numero && <p className="text-sm text-gray-500 mt-0.5">N° {numero}</p>}
+        </div>
+      </div>
+
+      {numero && (
+        <DevisForm
+          onSave={handleSave}
+          saving={saving}
+          initialNumero={numero}
+        />
+      )}
+    </div>
+  )
+}
