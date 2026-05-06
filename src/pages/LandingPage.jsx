@@ -91,7 +91,7 @@ export default function LandingPage() {
                   <div className="dot dot-red" />
                   <div className="dot dot-yellow" />
                   <div className="dot dot-green" />
-                  <span className="mockup-topbar-title">chantierpro.fr/dashboard</span>
+                  <span className="mockup-topbar-title">batiprelvio.vercel.app/dashboard</span>
                 </div>
                 <div className="mockup-body">
                   <div className="mockup-header">
@@ -225,7 +225,7 @@ export default function LandingPage() {
           <div className="step">
             <div className="step-number">1</div>
             <h3>Créez votre compte</h3>
-            <p>Inscription gratuite en 30 secondes. Renseignez votre entreprise (nom, SIRET, logo) dans les paramètres.</p>
+            <p>Inscription gratuite en 30 secondes. Renseignez votre entreprise (nom, numéro BCE, logo) dans les paramètres.</p>
           </div>
           <div className="step">
             <div className="step-number">2</div>

@@ -29,7 +29,7 @@ export function generateDevisPDF({ devis, client, lignes, entreprise }) {
     entreprise?.email,
   ].filter(Boolean).join('  |  ')
   if (entrepriseInfo) doc.text(entrepriseInfo, textX, 24)
-  if (entreprise?.siret) doc.text(`SIRET : ${entreprise.siret}`, textX, 30)
+  if (entreprise?.siret) doc.text(`BCE : ${entreprise.siret}`, textX, 30)
 
   // Numéro de devis (droite)
   doc.setFont('helvetica', 'bold')
@@ -173,7 +173,7 @@ export function generateFacturePDF({ facture, client, lignes, entreprise }) {
   doc.setFontSize(8)
   const info = [entreprise?.adresse, entreprise?.tel, entreprise?.email].filter(Boolean).join('  |  ')
   if (info) doc.text(info, textX, 24)
-  if (entreprise?.siret) doc.text(`SIRET : ${entreprise.siret}`, textX, 30)
+  if (entreprise?.siret) doc.text(`BCE : ${entreprise.siret}`, textX, 30)
 
   // Numéro de facture (droite)
   doc.setFont('helvetica', 'bold')

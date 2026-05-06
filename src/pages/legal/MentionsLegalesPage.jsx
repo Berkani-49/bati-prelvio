@@ -20,8 +20,8 @@ export default function MentionsLegalesPage() {
             <ul className="mt-2 space-y-1 list-none pl-0">
               <li><strong>Raison sociale :</strong> Prelvio</li>
               <li><strong>Forme juridique :</strong> Indépendant (personne physique)</li>
-              <li><strong>Numéro d'entreprise BCE :</strong> [À COMPLÉTER — format 0XXX.XXX.XXX]</li>
-              <li><strong>Numéro de TVA :</strong> BE + numéro BCE (si assujetti)</li>
+              <li><strong>Numéro d'entreprise BCE :</strong> [1035.819.745]</li>
+              <li><strong>Numéro de TVA :</strong> BE1035.819.745</li>
               <li><strong>Adresse :</strong> Charleroi, Belgique</li>
               <li><strong>Email :</strong> <a href="mailto:info@prelvio.com" className="text-blue-600">info@prelvio.com</a></li>
             </ul>
@@ -29,7 +29,7 @@ export default function MentionsLegalesPage() {
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-3">2. Responsable de la publication</h2>
-            <p>[À COMPLÉTER — Prénom Nom, en qualité de responsable de l'entreprise]</p>
+            <p>[EL Attaoui Amir, en qualité de responsable de l'entreprise]</p>
           </section>
 
           <section>

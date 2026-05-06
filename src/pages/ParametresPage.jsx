@@ -125,8 +125,8 @@ export default function ParametresPage() {
 
         <div className="grid grid-cols-2 gap-4">
           <Input
-            label="SIRET"
-            placeholder="123 456 789 00010"
+            label="Numéro BCE"
+            placeholder="0XXX.XXX.XXX"
             {...register('siret')}
           />
           <Input
@@ -161,7 +161,7 @@ export default function ParametresPage() {
       <div className="card p-5 bg-blue-50 border-blue-100">
         <p className="text-sm text-blue-800 font-medium mb-1">💡 À savoir</p>
         <p className="text-sm text-blue-700">
-          Le nom, SIRET, email, téléphone et adresse de votre entreprise sont utilisés automatiquement
+          Le nom, numéro BCE, email, téléphone et adresse de votre entreprise sont utilisés automatiquement
           lors de la génération des PDFs (devis et factures).
         </p>
       </div>
