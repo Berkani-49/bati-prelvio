@@ -19,7 +19,7 @@ export default function CGUPage() {
             <p>
               Les présentes Conditions Générales d'Utilisation (CGU) régissent l'accès et l'utilisation
               du service <strong>Bati Prelvio</strong>, logiciel de gestion de devis, chantiers et facturation
-              destiné aux artisans et PME du bâtiment, édité par Prelvio.
+              destiné aux artisans et PME du bâtiment, édité par Prelvio (indépendant établi en Belgique).
             </p>
             <p className="mt-2">
               En créant un compte, vous acceptez sans réserve les présentes CGU dans leur intégralité.
@@ -50,9 +50,9 @@ export default function CGUPage() {
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-3">4. Données et responsabilité</h2>
             <p>
-              Vous êtes seul responsable des données que vous saisissez dans le service (informations clients,
-              montants, prestations). Bati Prelvio agit en qualité de <strong>sous-traitant</strong> au sens du
-              RGPD pour les données de vos clients — vous êtes responsable du traitement.
+              Vous êtes seul responsable des données que vous saisissez (informations clients, montants, prestations).
+              Bati Prelvio agit en qualité de <strong>sous-traitant</strong> au sens du RGPD pour les données de
+              vos clients — vous en êtes le responsable du traitement.
             </p>
             <p className="mt-2">
               Bati Prelvio ne saurait être tenu responsable de pertes de données liées à une mauvaise
@@ -65,7 +65,7 @@ export default function CGUPage() {
             <ul className="space-y-2 list-disc pl-4">
               <li>Un plan gratuit est disponible avec des fonctionnalités limitées.</li>
               <li>Le plan Pro est payant selon les tarifs indiqués sur la page d'accueil.</li>
-              <li>Les prix sont indiqués en euros TTC.</li>
+              <li>Les prix sont indiqués en euros HTVA (hors TVA belge applicable).</li>
               <li>Tout abonnement est résilié à la demande de l'utilisateur — aucun renouvellement automatique sans consentement explicite.</li>
             </ul>
           </section>
@@ -74,7 +74,7 @@ export default function CGUPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-3">6. Disponibilité du service</h2>
             <p>
               Bati Prelvio s'efforce de maintenir le service accessible 24h/24, 7j/7.
-              Cependant, des interruptions peuvent survenir pour maintenance ou en cas de force majeure.
+              Des interruptions peuvent survenir pour maintenance ou en cas de force majeure.
               Nous ne garantissons pas une disponibilité sans interruption.
             </p>
           </section>
@@ -84,8 +84,8 @@ export default function CGUPage() {
             <p>
               Vous pouvez supprimer votre compte à tout moment depuis la page <strong>Paramètres</strong>.
               La suppression entraîne l'effacement définitif de toutes vos données (clients, devis, chantiers,
-              factures) dans un délai maximum de 30 jours, sous réserve des obligations légales de conservation
-              (données comptables conservées 10 ans conformément au Code de commerce).
+              factures), sous réserve des obligations légales de conservation comptable (7 ans conformément
+              au Code des sociétés et associations belge).
             </p>
           </section>
 
@@ -93,8 +93,8 @@ export default function CGUPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-3">8. Propriété intellectuelle</h2>
             <p>
               Le service Bati Prelvio, son code, son interface et ses contenus sont la propriété de Prelvio
-              et sont protégés par le droit d'auteur. L'utilisateur bénéficie d'une licence d'utilisation
-              personnelle, non exclusive et non transférable.
+              et protégés par la loi belge du 30 juin 1994 relative au droit d'auteur.
+              L'utilisateur bénéficie d'une licence d'utilisation personnelle, non exclusive et non transférable.
             </p>
           </section>
 
@@ -110,8 +110,9 @@ export default function CGUPage() {
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-3">10. Droit applicable et juridiction</h2>
             <p>
-              Les présentes CGU sont soumises au droit français. En cas de litige, et à défaut de résolution
-              amiable, les tribunaux français seront seuls compétents.
+              Les présentes CGU sont soumises au <strong>droit belge</strong>. En cas de litige,
+              et à défaut de résolution amiable, les <strong>tribunaux de l'arrondissement judiciaire de
+              Charleroi</strong> seront seuls compétents.
             </p>
             <p className="mt-2">
               Contact : <a href="mailto:info@prelvio.com" className="text-blue-600">info@prelvio.com</a>

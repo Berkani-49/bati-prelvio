@@ -19,16 +19,17 @@ export default function MentionsLegalesPage() {
             <p>Le site <strong>Bati Prelvio</strong> (accessible à l'adresse bati-prelvio.vercel.app) est édité par :</p>
             <ul className="mt-2 space-y-1 list-none pl-0">
               <li><strong>Raison sociale :</strong> Prelvio</li>
-              <li><strong>Forme juridique :</strong> [À COMPLÉTER — ex : Auto-entrepreneur, SASU…]</li>
-              <li><strong>SIRET :</strong> [À COMPLÉTER]</li>
-              <li><strong>Adresse :</strong> [À COMPLÉTER]</li>
+              <li><strong>Forme juridique :</strong> Indépendant (personne physique)</li>
+              <li><strong>Numéro d'entreprise BCE :</strong> [À COMPLÉTER — format 0XXX.XXX.XXX]</li>
+              <li><strong>Numéro de TVA :</strong> BE + numéro BCE (si assujetti)</li>
+              <li><strong>Adresse :</strong> Charleroi, Belgique</li>
               <li><strong>Email :</strong> <a href="mailto:info@prelvio.com" className="text-blue-600">info@prelvio.com</a></li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-gray-900 mb-3">2. Directeur de la publication</h2>
-            <p>[À COMPLÉTER — Prénom Nom, en qualité de représentant légal]</p>
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">2. Responsable de la publication</h2>
+            <p>[À COMPLÉTER — Prénom Nom, en qualité de responsable de l'entreprise]</p>
           </section>
 
           <section>
@@ -43,7 +44,7 @@ export default function MentionsLegalesPage() {
               <li>
                 <strong>Supabase Inc.</strong> — 970 Toa Payoh North #07-04, Singapour
                 (<a href="https://supabase.com" target="_blank" rel="noopener noreferrer" className="text-blue-600">supabase.com</a>)
-                — base de données, authentification (serveurs EU disponibles)
+                — base de données et authentification (données hébergées dans l'UE)
               </li>
             </ul>
           </section>
@@ -52,7 +53,8 @@ export default function MentionsLegalesPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-3">4. Propriété intellectuelle</h2>
             <p>
               L'ensemble des éléments constituant ce site (textes, logos, images, interface)
-              sont la propriété exclusive de Prelvio et sont protégés par le droit d'auteur français.
+              sont la propriété exclusive de Prelvio et sont protégés par le droit d'auteur belge
+              (Loi du 30 juin 1994 relative au droit d'auteur et aux droits voisins).
               Toute reproduction, représentation, modification ou diffusion sans autorisation expresse est interdite.
             </p>
           </section>

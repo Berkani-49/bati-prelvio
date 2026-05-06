@@ -10,7 +10,7 @@ export default function ConfidentialitePage() {
         </Link>
 
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Politique de confidentialité</h1>
-        <p className="text-sm text-gray-400 mb-10">Dernière mise à jour : mai 2026 — conforme RGPD (Règlement UE 2016/679)</p>
+        <p className="text-sm text-gray-400 mb-10">Dernière mise à jour : mai 2026 — conforme au RGPD (Règlement UE 2016/679) et à la loi belge du 30 juillet 2018</p>
 
         <div className="prose prose-sm max-w-none space-y-8 text-gray-700">
 
@@ -18,7 +18,8 @@ export default function ConfidentialitePage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-3">1. Responsable du traitement</h2>
             <p>
               Le responsable du traitement de vos données personnelles est <strong>Prelvio</strong>,
-              joignable à l'adresse : <a href="mailto:info@prelvio.com" className="text-blue-600">info@prelvio.com</a>.
+              indépendant établi à Charleroi, Belgique.
+              Contact : <a href="mailto:info@prelvio.com" className="text-blue-600">info@prelvio.com</a>
             </p>
           </section>
 
@@ -42,7 +43,7 @@ export default function ConfidentialitePage() {
                     <td className="px-4 py-2">Durée du compte</td>
                   </tr>
                   <tr>
-                    <td className="px-4 py-2">Données entreprise (nom, SIRET, adresse, tél)</td>
+                    <td className="px-4 py-2">Données entreprise (nom, BCE, adresse, tél)</td>
                     <td className="px-4 py-2">Génération des PDF devis/factures</td>
                     <td className="px-4 py-2">Exécution du contrat</td>
                     <td className="px-4 py-2">Durée du compte</td>
@@ -51,13 +52,13 @@ export default function ConfidentialitePage() {
                     <td className="px-4 py-2">Données clients (nom, email, tél, adresse)</td>
                     <td className="px-4 py-2">Création de devis et factures</td>
                     <td className="px-4 py-2">Intérêt légitime</td>
-                    <td className="px-4 py-2">Durée du compte + 5 ans</td>
+                    <td className="px-4 py-2">Durée du compte + 7 ans</td>
                   </tr>
                   <tr>
                     <td className="px-4 py-2">Devis & factures (montants, prestations)</td>
                     <td className="px-4 py-2">Gestion commerciale</td>
                     <td className="px-4 py-2">Obligation légale (comptabilité)</td>
-                    <td className="px-4 py-2">10 ans (obligation fiscale)</td>
+                    <td className="px-4 py-2">7 ans (Code des sociétés belge)</td>
                   </tr>
                 </tbody>
               </table>
@@ -70,11 +71,11 @@ export default function ConfidentialitePage() {
             <ul className="mt-3 space-y-3 list-none pl-0">
               <li className="p-3 bg-gray-50 rounded-lg">
                 <strong>Supabase Inc.</strong> — Authentification et base de données.<br />
-                <span className="text-gray-500 text-xs">Données stockées en Europe (région EU disponible). DPA disponible sur supabase.com/legal/dpa</span>
+                <span className="text-gray-500 text-xs">Données hébergées dans l'UE. DPA disponible sur supabase.com/legal/dpa</span>
               </li>
               <li className="p-3 bg-gray-50 rounded-lg">
                 <strong>Vercel Inc.</strong> — Hébergement de l'application front-end.<br />
-                <span className="text-gray-500 text-xs">Serveurs Edge — DPA disponible sur vercel.com/legal/dpa</span>
+                <span className="text-gray-500 text-xs">Réseau Edge mondial. DPA disponible sur vercel.com/legal/dpa</span>
               </li>
               <li className="p-3 bg-gray-50 rounded-lg">
                 <strong>Brevo (Sendinblue SAS)</strong> — Envoi d'emails transactionnels (devis, factures).<br />
@@ -94,9 +95,8 @@ export default function ConfidentialitePage() {
               sans empêcher le fonctionnement du service.
             </p>
             <p className="mt-2">
-              Certaines données de configuration (nom entreprise, coordonnées) sont stockées dans
-              le <strong>localStorage</strong> de votre navigateur pour un accès hors-ligne. Vous pouvez
-              les effacer via les paramètres de votre navigateur.
+              Certaines données de configuration sont stockées dans le <strong>localStorage</strong> de votre navigateur.
+              Vous pouvez les effacer via les paramètres de votre navigateur.
             </p>
             <p className="mt-2 text-sm text-gray-500">
               Aucun cookie analytique, publicitaire ou de tracking tiers n'est utilisé.
@@ -107,20 +107,20 @@ export default function ConfidentialitePage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-3">5. Sécurité</h2>
             <ul className="space-y-1 list-disc pl-4">
               <li>Authentification gérée par Supabase Auth (mots de passe hachés)</li>
-              <li>Accès aux données limité par Row Level Security (RLS) — chaque utilisateur ne voit que ses données</li>
+              <li>Accès aux données limité par Row Level Security — chaque utilisateur ne voit que ses propres données</li>
               <li>Communications chiffrées via HTTPS/TLS</li>
-              <li>Clés API Brevo stockées côté serveur (Edge Function), jamais exposées au client</li>
+              <li>Clés API stockées côté serveur (Edge Function), jamais exposées au client</li>
             </ul>
           </section>
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-3">6. Vos droits (RGPD Art. 15-22)</h2>
-            <p>Conformément au RGPD, vous disposez des droits suivants :</p>
+            <p>Conformément au RGPD et à la loi belge du 30 juillet 2018, vous disposez des droits suivants :</p>
             <ul className="mt-3 space-y-2 list-none pl-0">
               {[
                 ['Droit d\'accès (Art. 15)', 'Obtenir une copie de vos données'],
                 ['Droit de rectification (Art. 16)', 'Corriger vos informations depuis la page Paramètres'],
-                ['Droit à l\'effacement (Art. 17)', 'Supprimer votre compte depuis la page Paramètres — toutes vos données sont supprimées'],
+                ['Droit à l\'effacement (Art. 17)', 'Supprimer votre compte depuis Paramètres — toutes vos données sont supprimées immédiatement'],
                 ['Droit à la portabilité (Art. 20)', 'Recevoir vos données dans un format structuré'],
                 ['Droit d\'opposition (Art. 21)', 'Vous opposer à un traitement basé sur l\'intérêt légitime'],
               ].map(([droit, desc]) => (
@@ -135,17 +135,19 @@ export default function ConfidentialitePage() {
               Nous répondons dans un délai maximum de <strong>30 jours</strong>.
             </p>
             <p className="mt-2 text-sm text-gray-500">
-              Vous pouvez également introduire une réclamation auprès de la{' '}
-              <a href="https://www.cnil.fr/fr/plaintes" target="_blank" rel="noopener noreferrer" className="text-blue-600">
-                CNIL
-              </a>.
+              Vous pouvez également introduire une réclamation auprès de l'
+              <strong>APD — Autorité de Protection des Données</strong> (autorité de contrôle belge) :{' '}
+              <a href="https://www.autoriteprotectiondonnees.be" target="_blank" rel="noopener noreferrer" className="text-blue-600">
+                autoriteprotectiondonnees.be
+              </a>
+              {' '}— Rue de la Presse 35, 1000 Bruxelles.
             </p>
           </section>
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-3">7. Contact</h2>
             <p>
-              Délégué à la Protection des Données (ou responsable RGPD) :{' '}
+              Toute demande relative à vos données personnelles :{' '}
               <a href="mailto:info@prelvio.com" className="text-blue-600">info@prelvio.com</a>
             </p>
           </section>
