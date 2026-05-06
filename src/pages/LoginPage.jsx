@@ -3,10 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { MailCheck } from 'lucide-react'
+import { MailCheck, ArrowRight, CheckCircle2 } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
-import Input from '../components/ui/Input'
-import Button from '../components/ui/Button'
 import toast from 'react-hot-toast'
 
 const schema = z.object({
@@ -26,12 +24,18 @@ function translateError(message) {
   return message
 }
 
+const features = [
+  'Devis professionnels en 2 minutes',
+  'PDF généré & envoyé par email automatiquement',
+  'Suivi chantiers & facturation intégrée',
+]
+
 export default function LoginPage() {
-  const [mode, setMode]             = useState('login')
-  const [loading, setLoading]       = useState(false)
-  const [emailSent, setEmailSent]   = useState(false)
-  const { signIn, signUp }          = useAuth()
-  const navigate                    = useNavigate()
+  const [mode, setMode]           = useState('login')
+  const [loading, setLoading]     = useState(false)
+  const [emailSent, setEmailSent] = useState(false)
+  const { signIn, signUp }        = useAuth()
+  const navigate                  = useNavigate()
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
@@ -52,7 +56,7 @@ export default function LoginPage() {
       } else {
         const data = await signUp(email, password)
         if (data?.session) {
-          toast.success('Compte créé ! Bienvenue 🎉')
+          toast.success('Compte créé ! Bienvenue')
           navigate('/dashboard')
         } else {
           setEmailSent(true)
@@ -65,98 +69,169 @@ export default function LoginPage() {
     }
   }
 
+  /* ── Écran email envoyé ── */
   if (emailSent) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-4">
-        <div className="w-full max-w-sm space-y-8">
-          <div className="flex flex-col items-center">
-            <img src="/logo.png" alt="Bati Prelvio" className="w-16 h-16 object-contain mb-4 drop-shadow-lg" />
-            <h1 className="text-2xl font-bold text-white">Bati Prelvio</h1>
+      <div className="min-h-screen bg-white flex items-center justify-center p-6">
+        <div className="text-center max-w-sm">
+          <img src="/logo.png" alt="Bati Prelvio" className="w-20 h-20 object-contain mx-auto mb-8" />
+          <div className="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <MailCheck size={26} className="text-blue-600" />
           </div>
-          <div className="bg-white rounded-2xl shadow-2xl p-8 text-center space-y-4">
-            <div className="flex items-center justify-center w-14 h-14 bg-primary-100 rounded-full mx-auto">
-              <MailCheck size={26} className="text-primary-600" />
-            </div>
-            <h2 className="text-lg font-semibold text-gray-900">Vérifiez votre email</h2>
-            <p className="text-sm text-gray-500">
-              Un lien de confirmation a été envoyé à votre adresse email. Cliquez dessus pour activer votre compte.
-            </p>
-            <p className="text-xs text-gray-400">Pas reçu ? Vérifiez vos spams.</p>
-            <button
-              type="button"
-              onClick={() => switchMode('login')}
-              className="text-sm text-primary-600 hover:text-primary-800 font-medium"
-            >
-              Retour à la connexion
-            </button>
-          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Vérifiez votre email</h2>
+          <p className="text-gray-500 text-sm mb-1">
+            Un lien de confirmation a été envoyé à votre adresse.
+          </p>
+          <p className="text-gray-400 text-xs mb-8">Pas reçu ? Vérifiez vos spams.</p>
+          <button
+            type="button"
+            onClick={() => switchMode('login')}
+            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+          >
+            ← Retour à la connexion
+          </button>
         </div>
       </div>
     )
   }
 
+  /* ── Page principale split ── */
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-4">
-      <div className="w-full max-w-sm space-y-8">
-        <div className="flex flex-col items-center">
-          <img src="/logo.png" alt="Bati Prelvio" className="w-20 h-20 object-contain mb-4 drop-shadow-lg" />
-          <h1 className="text-2xl font-bold text-white">Bati Prelvio</h1>
-          <p className="text-slate-400 text-sm mt-1">Gestion devis & chantiers BTP</p>
+    <div className="min-h-screen bg-white flex">
+
+      {/* ── Panneau gauche — branding ── */}
+      <div className="hidden lg:flex lg:w-1/2 flex-col bg-[#f8faff] border-r border-gray-100 p-14 relative overflow-hidden">
+
+        {/* Cercles déco */}
+        <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-blue-100/60 blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-72 h-72 rounded-full bg-blue-50/80 blur-2xl pointer-events-none" />
+
+        {/* Logo */}
+        <div className="relative">
+          <img src="/logo.png" alt="Bati Prelvio" className="w-28 h-28 object-contain" />
+          <p className="text-gray-400 text-sm mt-3 font-medium tracking-wide uppercase">Bati Prelvio</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-2xl p-8 space-y-5">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900">
-              {mode === 'login' ? 'Connexion' : 'Créer un compte'}
-            </h2>
-            <p className="text-sm text-gray-500 mt-0.5">
-              {mode === 'login' ? 'Accédez à votre espace Bati Prelvio' : 'Commencez gratuitement'}
-            </p>
-          </div>
+        {/* Titre */}
+        <div className="relative flex-1 flex flex-col justify-center">
+          <h1 className="text-4xl font-extrabold text-gray-900 leading-tight mb-4">
+            Gérez vos chantiers<br />
+            <span className="text-blue-600">sans prise de tête.</span>
+          </h1>
+          <p className="text-gray-500 text-base leading-relaxed mb-10 max-w-sm">
+            L'outil pensé pour les artisans BTP — devis, suivi chantier et facturation en un seul endroit.
+          </p>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <Input
-              label="Adresse email"
-              type="email"
-              placeholder="vous@exemple.fr"
-              error={errors.email?.message}
-              {...register('email')}
-            />
-            <Input
-              label="Mot de passe"
-              type="password"
-              placeholder="••••••••"
-              error={errors.password?.message}
-              hint={mode === 'register' ? '6 caractères minimum' : undefined}
-              {...register('password')}
-            />
-            <Button type="submit" loading={loading} className="w-full" size="lg">
-              {mode === 'login' ? 'Se connecter' : 'Créer mon compte'}
-            </Button>
+          <ul className="space-y-4">
+            {features.map((f) => (
+              <li key={f} className="flex items-start gap-3">
+                <CheckCircle2 size={18} className="text-blue-500 mt-0.5 shrink-0" />
+                <span className="text-gray-600 text-sm">{f}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Footer */}
+        <p className="relative text-xs text-gray-400">
+          © {new Date().getFullYear()} Bati Prelvio
+        </p>
+      </div>
+
+      {/* ── Panneau droit — formulaire ── */}
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-8 sm:p-14">
+
+        {/* Logo mobile uniquement */}
+        <div className="lg:hidden mb-10 text-center">
+          <img src="/logo.png" alt="Bati Prelvio" className="w-20 h-20 object-contain mx-auto mb-2" />
+          <p className="text-gray-500 text-sm font-medium">Bati Prelvio</p>
+        </div>
+
+        <div className="w-full max-w-sm">
+          <h2 className="text-2xl font-bold text-gray-900 mb-1">
+            {mode === 'login' ? 'Bon retour' : 'Créer un compte'}
+          </h2>
+          <p className="text-gray-400 text-sm mb-8">
+            {mode === 'login'
+              ? 'Connectez-vous à votre espace'
+              : 'Commencez gratuitement, sans carte bancaire'}
+          </p>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Adresse email
+              </label>
+              <input
+                type="email"
+                placeholder="vous@exemple.fr"
+                autoComplete="email"
+                className={`w-full h-11 px-4 text-sm bg-white border rounded-xl transition-colors outline-none
+                  focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                  ${errors.email ? 'border-red-400' : 'border-gray-200 hover:border-gray-300'}`}
+                {...register('email')}
+              />
+              {errors.email && (
+                <p className="mt-1.5 text-xs text-red-500">{errors.email.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Mot de passe
+              </label>
+              <input
+                type="password"
+                placeholder="••••••••"
+                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                className={`w-full h-11 px-4 text-sm bg-white border rounded-xl transition-colors outline-none
+                  focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                  ${errors.password ? 'border-red-400' : 'border-gray-200 hover:border-gray-300'}`}
+                {...register('password')}
+              />
+              {errors.password && (
+                <p className="mt-1.5 text-xs text-red-500">{errors.password.message}</p>
+              )}
+              {mode === 'register' && !errors.password && (
+                <p className="mt-1.5 text-xs text-gray-400">6 caractères minimum</p>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-11 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed mt-2"
+            >
+              {loading ? (
+                <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              ) : (
+                <>
+                  {mode === 'login' ? 'Se connecter' : 'Créer mon compte'}
+                  <ArrowRight size={16} />
+                </>
+              )}
+            </button>
           </form>
 
-          <div className="text-center">
+          <div className="mt-6 pt-6 border-t border-gray-100 text-center">
             <button
               type="button"
               onClick={() => switchMode(mode === 'login' ? 'register' : 'login')}
-              className="text-sm text-primary-600 hover:text-primary-800 font-medium"
+              className="text-sm text-gray-500 hover:text-gray-800 transition-colors"
             >
               {mode === 'login'
-                ? "Pas encore de compte ? S'inscrire"
-                : 'Déjà un compte ? Se connecter'}
+                ? <>Pas encore de compte ? <span className="text-blue-600 font-medium">S'inscrire</span></>
+                : <>Déjà un compte ? <span className="text-blue-600 font-medium">Se connecter</span></>
+              }
             </button>
           </div>
 
           {mode === 'login' && (
-            <p className="text-center text-xs text-gray-400">
+            <p className="text-center text-xs text-gray-400 mt-4">
               Si vous venez de créer votre compte, confirmez d'abord votre email.
             </p>
           )}
         </div>
-
-        <p className="text-center text-xs text-slate-500">
-          © {new Date().getFullYear()} Bati Prelvio — Tous droits réservés
-        </p>
       </div>
     </div>
   )
