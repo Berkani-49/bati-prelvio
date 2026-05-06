@@ -300,6 +300,12 @@ export default function LandingPage() {
           <span>Bati Prelvio</span>
         </div>
         <p>© 2026 Bati Prelvio — Logiciel de gestion BTP pour artisans. Tous droits réservés.</p>
+        <div style={{ display: 'flex', gap: '24px', justifyContent: 'center', marginTop: '12px', flexWrap: 'wrap' }}>
+          <Link to="/mentions-legales" style={{ color: '#94a3b8', fontSize: '13px', textDecoration: 'none' }}>Mentions légales</Link>
+          <Link to="/confidentialite" style={{ color: '#94a3b8', fontSize: '13px', textDecoration: 'none' }}>Politique de confidentialité</Link>
+          <Link to="/cgu" style={{ color: '#94a3b8', fontSize: '13px', textDecoration: 'none' }}>CGU</Link>
+          <a href="mailto:info@prelvio.com" style={{ color: '#94a3b8', fontSize: '13px', textDecoration: 'none' }}>Contact</a>
+        </div>
       </footer>
     </div>
   )

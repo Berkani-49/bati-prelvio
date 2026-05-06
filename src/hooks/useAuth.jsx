@@ -35,8 +35,17 @@ export function AuthProvider({ children }) {
     await supabase.auth.signOut()
   }
 
+  async function deleteAccount() {
+    const { data, error } = await supabase.functions.invoke('delete-account')
+    if (error) throw new Error(error.message || 'Erreur lors de la suppression du compte')
+    if (data?.error) throw new Error(data.error)
+    // Nettoyer le localStorage
+    ;['cp_nom', 'cp_email', 'cp_tel', 'cp_adresse', 'cp_siret'].forEach(k => localStorage.removeItem(k))
+    await supabase.auth.signOut()
+  }
+
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, deleteAccount }}>
       {children}
     </AuthContext.Provider>
   )

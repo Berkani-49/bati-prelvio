@@ -37,7 +37,10 @@ serve(async (req) => {
           <p style="color:#6b7280">${bodyText}</p>
           <hr style="border:0;border-top:1px solid #e5e7eb;margin:24px 0"/>
           <p style="color:#9ca3af;font-size:12px">
-            Généré par Bati Prelvio — Logiciel de gestion BTP pour artisans
+            Généré par Bati Prelvio — Logiciel de gestion BTP pour artisans<br/>
+            <a href="https://bati-prelvio.vercel.app/confidentialite" style="color:#9ca3af;font-size:11px;text-decoration:none">Politique de confidentialité</a>
+            &nbsp;·&nbsp;
+            <a href="mailto:info@prelvio.com" style="color:#9ca3af;font-size:11px;text-decoration:none">Contact RGPD</a>
           </p>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider, useAuth } from './hooks/useAuth'
 import AppLayout from './components/layout/AppLayout'
@@ -16,6 +16,9 @@ import FactureNewPage  from './pages/factures/FactureNewPage'
 import FactureEditPage from './pages/factures/FactureEditPage'
 import ParametresPage from './pages/ParametresPage'
 import NotFoundPage from './pages/NotFoundPage'
+import MentionsLegalesPage from './pages/legal/MentionsLegalesPage'
+import ConfidentialitePage from './pages/legal/ConfidentialitePage'
+import CGUPage from './pages/legal/CGUPage'
 import Spinner from './components/ui/Spinner'
 
 function ProtectedRoute({ children }) {
@@ -33,10 +36,13 @@ function AppRoutes() {
   return (
     <Routes>
       {/* Public routes */}
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/login" element={<LoginPage />} />
+      <Route path="/"                  element={<LandingPage />} />
+      <Route path="/login"             element={<LoginPage />} />
+      <Route path="/mentions-legales"  element={<MentionsLegalesPage />} />
+      <Route path="/confidentialite"   element={<ConfidentialitePage />} />
+      <Route path="/cgu"               element={<CGUPage />} />
 
-      {/* Protected app routes — pathless layout route */}
+      {/* Protected app routes */}
       <Route
         element={
           <ProtectedRoute>
