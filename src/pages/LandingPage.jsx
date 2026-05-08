@@ -277,7 +277,7 @@ export default function LandingPage() {
               <li>Facturation complète</li>
               <li>Logo entreprise sur PDF</li>
             </ul>
-            <Link to="/login" className="pricing-cta primary">Essayer 30 jours gratuit</Link>
+            <Link to="/checkout" className="pricing-cta primary">Essayer 30 jours gratuit</Link>
           </div>
         </div>
       </section>

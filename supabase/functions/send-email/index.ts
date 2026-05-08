@@ -1,4 +1,11 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import {
+  devisEmail,
+  factureEmail,
+  relanceEmail,
+  signatureRequestEmail,
+  invitationEmail,
+} from '../_shared/email-templates.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -6,68 +13,73 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
-  }
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
 
   try {
-    const { type, to, clientName, numero, pdfBase64 } = await req.json()
+    const payload = await req.json()
+    const { type, to, clientName, numero, pdfBase64, montantTTC, dateEcheance, signingUrl, inviteUrl, senderName } = payload
 
-    const apiKey    = Deno.env.get('BREVO_API_KEY')
+    const apiKey = Deno.env.get('BREVO_API_KEY')
+    if (!apiKey) throw new Error('BREVO_API_KEY non configurée')
+
     const fromEmail = Deno.env.get('FROM_EMAIL') || 'info@batiprelvio.fr'
     const fromName  = Deno.env.get('FROM_NAME')  || 'Bati Prelvio'
 
-    if (!apiKey) throw new Error('BREVO_API_KEY non configurée')
+    let subject    = ''
+    let bodyHtml   = ''
+    let attachment = pdfBase64 ? [{ name: `${type === 'facture' ? 'facture' : type === 'relance' ? 'facture' : 'devis'}-${numero}.pdf`, content: pdfBase64 }] : []
 
-    const isFacture = type === 'facture'
-    const subject   = isFacture ? `Votre facture N° ${numero}` : `Votre devis N° ${numero}`
-    const docLabel  = isFacture ? 'facture' : 'devis'
-    const fileName  = isFacture ? `facture-${numero}.pdf` : `devis-${numero}.pdf`
-    const bodyText  = isFacture
-      ? `Veuillez trouver ci-joint votre facture <strong>N° ${numero}</strong>.<br>Merci de régler ce montant dans les délais indiqués sur la facture.`
-      : `Veuillez trouver ci-joint votre devis <strong>N° ${numero}</strong>.<br>Ce devis est valable 30 jours à compter de la date d'émission.`
+    if (type === 'devis') {
+      subject  = `Votre devis N° ${numero} — Bati Prelvio`
+      bodyHtml = devisEmail(clientName, numero)
 
-    const html = `
-      <div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto">
-        <div style="background:#2563eb;padding:24px 32px;border-radius:8px 8px 0 0">
-          <h1 style="color:white;margin:0;font-size:22px">Bati Prelvio</h1>
-        </div>
-        <div style="background:#f9fafb;padding:32px;border:1px solid #e5e7eb;border-top:0;border-radius:0 0 8px 8px">
-          <p style="color:#374151;font-size:16px">Bonjour <strong>${clientName}</strong>,</p>
-          <p style="color:#6b7280">${bodyText}</p>
-          <hr style="border:0;border-top:1px solid #e5e7eb;margin:24px 0"/>
-          <p style="color:#9ca3af;font-size:12px">
-            Généré par Bati Prelvio — Logiciel de gestion BTP pour artisans<br/>
-            <a href="https://bati-prelvio.vercel.app/confidentialite" style="color:#9ca3af;font-size:11px;text-decoration:none">Politique de confidentialité</a>
-            &nbsp;·&nbsp;
-            <a href="mailto:info@prelvio.com" style="color:#9ca3af;font-size:11px;text-decoration:none">Contact RGPD</a>
-          </p>
-        </div>
-      </div>
-    `
+    } else if (type === 'facture') {
+      subject  = `Votre facture N° ${numero} — Bati Prelvio`
+      bodyHtml = factureEmail(clientName, numero, montantTTC, dateEcheance)
+
+    } else if (type === 'relance') {
+      subject    = `Rappel de paiement — Facture N° ${numero}`
+      bodyHtml   = relanceEmail(clientName, numero, montantTTC, dateEcheance)
+      attachment = pdfBase64 ? [{ name: `facture-${numero}.pdf`, content: pdfBase64 }] : []
+
+    } else if (type === 'signature_request') {
+      subject    = `Signature requise — Devis N° ${numero}`
+      bodyHtml   = signatureRequestEmail(clientName, numero, signingUrl)
+      attachment = []
+
+    } else if (type === 'invitation') {
+      subject    = `Invitation à rejoindre l'équipe sur Bati Prelvio`
+      bodyHtml   = invitationEmail(senderName || 'Un artisan', inviteUrl)
+      attachment = []
+
+    } else {
+      throw new Error(`Type d'email inconnu : ${type}`)
+    }
+
+    const body: Record<string, unknown> = {
+      sender:      { name: fromName, email: fromEmail },
+      to:          [{ email: to, name: clientName || to }],
+      subject,
+      htmlContent: bodyHtml,
+    }
+    if (attachment.length > 0) body.attachment = attachment
 
     const response = await fetch('https://api.brevo.com/v3/smtp/email', {
-      method: 'POST',
+      method:  'POST',
       headers: { 'Content-Type': 'application/json', 'api-key': apiKey },
-      body: JSON.stringify({
-        sender:      { name: fromName, email: fromEmail },
-        to:          [{ email: to, name: clientName }],
-        subject,
-        htmlContent: html,
-        attachment:  [{ name: fileName, content: pdfBase64 }],
-      }),
+      body:    JSON.stringify(body),
     })
 
     if (!response.ok) {
       const err = await response.json().catch(() => ({}))
-      throw new Error(err.message || `Erreur Brevo (${response.status})`)
+      throw new Error((err as any).message || `Erreur Brevo (${response.status})`)
     }
 
     return new Response(JSON.stringify({ ok: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
+    return new Response(JSON.stringify({ error: (err as Error).message }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })

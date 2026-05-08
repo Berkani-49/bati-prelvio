@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Building2, Save, Trash2, Upload, X } from 'lucide-react'
+import { Building2, Save, Trash2, Upload, X, Users, UserPlus, Mail, CheckCircle, Clock, Zap, Crown } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
+import { useSubscription } from '../hooks/useSubscription'
 import Input from '../components/ui/Input'
 import Button from '../components/ui/Button'
 import Spinner from '../components/ui/Spinner'
@@ -32,6 +33,8 @@ export default function ParametresPage() {
   const { user, deleteAccount }   = useAuth()
   const navigate                  = useNavigate()
   const fileInputRef              = useRef(null)
+  const { isPro, loading: subLoading } = useSubscription()
+  const [portalLoading, setPortalLoading]    = useState(false)
 
   const [loading, setLoading]           = useState(true)
   const [saving, setSaving]             = useState(false)
@@ -39,6 +42,11 @@ export default function ParametresPage() {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [logoUrl, setLogoUrl]           = useState(null)
   const [uploadingLogo, setUploadingLogo] = useState(false)
+
+  // Équipe
+  const [membres, setMembres]         = useState([])
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [inviting, setInviting]       = useState(false)
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
@@ -62,6 +70,45 @@ export default function ParametresPage() {
     }
     if (user) load()
   }, [user, reset])
+
+  useEffect(() => {
+    if (user) fetchMembres()
+  }, [user?.id])
+
+  async function fetchMembres() {
+    const { data } = await supabase
+      .from('equipe_membres')
+      .select('id, member_email, role, statut, created_at')
+      .eq('owner_id', user.id)
+      .order('created_at')
+    setMembres(data || [])
+  }
+
+  async function handleInvite(e) {
+    e.preventDefault()
+    if (!inviteEmail.trim()) return
+    setInviting(true)
+    try {
+      const { data, error } = await supabase.functions.invoke('send-invitation', {
+        body: { member_email: inviteEmail.trim() },
+      })
+      if (error || data?.error) throw new Error(data?.error || error?.message)
+      toast.success(`Invitation envoyée à ${inviteEmail}`)
+      setInviteEmail('')
+      fetchMembres()
+    } catch (err) {
+      toast.error(err.message || 'Erreur lors de l\'invitation')
+    } finally {
+      setInviting(false)
+    }
+  }
+
+  async function handleRemoveMembre(id) {
+    const { error } = await supabase.from('equipe_membres').delete().eq('id', id)
+    if (error) { toast.error('Erreur suppression'); return }
+    setMembres(prev => prev.filter(m => m.id !== id))
+    toast.success('Collaborateur retiré')
+  }
 
   async function onSubmit(formData) {
     setSaving(true)
@@ -119,6 +166,19 @@ export default function ParametresPage() {
       toast.success('Logo supprimé')
     } catch (err) {
       toast.error(err.message || 'Erreur suppression logo')
+    }
+  }
+
+  async function handlePortal() {
+    setPortalLoading(true)
+    try {
+      const { data, error } = await supabase.functions.invoke('customer-portal')
+      if (error) throw error
+      if (data?.url) window.location.href = data.url
+    } catch {
+      toast.error('Impossible d\'ouvrir le portail de facturation.')
+    } finally {
+      setPortalLoading(false)
     }
   }
 
@@ -192,8 +252,115 @@ export default function ParametresPage() {
       </form>
 
       <div className="card p-5 bg-blue-50 border-blue-100">
-        <p className="text-sm text-blue-800 font-medium mb-1">💡 À savoir</p>
+        <p className="text-sm text-blue-800 font-medium mb-1">À savoir</p>
         <p className="text-sm text-blue-700">Le logo, numéro BCE, email, téléphone et adresse sont utilisés automatiquement sur vos PDF.</p>
+      </div>
+
+      {/* Section Équipe */}
+      <div className="card p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <Users size={18} className="text-gray-600" />
+          <h2 className="section-title">Équipe</h2>
+        </div>
+        <p className="text-sm text-gray-500">
+          Invitez des collaborateurs pour qu'ils accèdent à votre espace (devis, chantiers, factures).
+        </p>
+
+        {/* Liste des membres */}
+        {membres.length > 0 && (
+          <div className="divide-y divide-gray-100 border border-gray-200 rounded-lg overflow-hidden">
+            {membres.map(m => (
+              <div key={m.id} className="flex items-center justify-between px-4 py-3 bg-white">
+                <div className="flex items-center gap-3">
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${
+                    m.statut === 'actif' ? 'bg-green-100' : 'bg-amber-100'
+                  }`}>
+                    {m.statut === 'actif'
+                      ? <CheckCircle size={14} className="text-green-600" />
+                      : <Clock size={14} className="text-amber-600" />
+                    }
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{m.member_email}</p>
+                    <p className="text-xs text-gray-400">
+                      {m.statut === 'actif' ? 'Actif' : 'Invitation en attente'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleRemoveMembre(m.id)}
+                  className="p-1.5 rounded hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"
+                  title="Retirer"
+                >
+                  <X size={15} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Formulaire invitation */}
+        <form onSubmit={handleInvite} className="flex gap-2">
+          <div className="flex-1 relative">
+            <Mail size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="email"
+              value={inviteEmail}
+              onChange={e => setInviteEmail(e.target.value)}
+              placeholder="email@collaborateur.fr"
+              required
+              className="w-full h-9 pl-8 pr-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            />
+          </div>
+          <Button type="submit" size="sm" loading={inviting}>
+            <UserPlus size={14} /> Inviter
+          </Button>
+        </form>
+        <p className="text-xs text-gray-400">
+          Le collaborateur recevra un email avec un lien pour rejoindre votre espace.
+        </p>
+      </div>
+
+      {/* Abonnement */}
+      <div className="card p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="section-title">Abonnement</h2>
+          {!subLoading && (
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${isPro ? 'bg-blue-50 text-blue-700' : 'bg-gray-100 text-gray-600'}`}>
+              {isPro ? <Crown size={12} /> : <Zap size={12} />}
+              {isPro ? 'Plan Pro' : 'Plan Gratuit'}
+            </span>
+          )}
+        </div>
+
+        {subLoading ? (
+          <Spinner size={18} />
+        ) : isPro ? (
+          <div className="space-y-3">
+            <p className="text-sm text-gray-500">Vous bénéficiez de toutes les fonctionnalités Pro : devis illimités, chantiers, facturation et logo sur PDF.</p>
+            <button
+              type="button"
+              onClick={handlePortal}
+              disabled={portalLoading}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+            >
+              {portalLoading ? <span className="w-4 h-4 border-2 border-gray-400 border-t-gray-700 rounded-full animate-spin" /> : <Crown size={14} />}
+              Gérer mon abonnement
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <p className="text-sm text-gray-500">Vous êtes sur le plan gratuit (5 devis/mois). Passez Pro pour tout débloquer.</p>
+            <button
+              type="button"
+              onClick={() => navigate('/checkout')}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+            >
+              <Zap size={14} />
+              Passer en Pro — 29 €/mois
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Zone danger */}
