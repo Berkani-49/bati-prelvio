@@ -7,19 +7,27 @@ import DevisForm from '../../components/devis/DevisForm'
 import toast from 'react-hot-toast'
 
 async function generateNumero() {
-  const year  = new Date().getFullYear()
-  const month = String(new Date().getMonth() + 1).padStart(2, '0')
+  const year   = new Date().getFullYear()
+  const month  = String(new Date().getMonth() + 1).padStart(2, '0')
+  const prefix = `DEV-${year}${month}-`
 
-  const { count } = await supabase
+  const { data } = await supabase
     .from('devis')
-    .select('*', { count: 'exact', head: true })
+    .select('numero')
+    .like('numero', `${prefix}%`)
+    .order('numero', { ascending: false })
+    .limit(1)
 
-  const seq = String((count || 0) + 1).padStart(3, '0')
+  const lastSeq = data?.[0]?.numero
+    ? parseInt(data[0].numero.replace(prefix, ''), 10)
+    : 0
+
+  const seq = String(lastSeq + 1).padStart(3, '0')
   return `DEV-${year}${month}-${seq}`
 }
 
 export default function DevisNewPage() {
-  const { user }            = useAuth()
+  const { effectiveUserId } = useAuth()
   const navigate            = useNavigate()
   const [saving, setSaving] = useState(false)
   const [numero, setNumero] = useState('')
@@ -31,7 +39,7 @@ export default function DevisNewPage() {
   async function handleSave(data) {
     setSaving(true)
     try {
-      const { client, lignes = [], totalHT, totalTVA, totalTTC } = data
+      const { client, lignes = [] } = data
 
       // Upsert client
       let clientId = client.id
@@ -43,7 +51,7 @@ export default function DevisNewPage() {
             email:   client.email || null,
             tel:     client.tel   || null,
             adresse: client.adresse || null,
-            user_id: user.id,
+            user_id: effectiveUserId,
           })
           .select()
           .single()
@@ -60,7 +68,7 @@ export default function DevisNewPage() {
       const { data: devis, error: dErr } = await supabase
         .from('devis')
         .insert({
-          user_id:   user.id,
+          user_id:   effectiveUserId,
           client_id: clientId,
           numero:    numero,
           statut:    'brouillon',
