@@ -10,8 +10,13 @@ import Dashboard from './pages/Dashboard'
 import DevisListPage from './pages/devis/DevisListPage'
 import DevisNewPage  from './pages/devis/DevisNewPage'
 import DevisEditPage from './pages/devis/DevisEditPage'
-import ChantierListPage from './pages/chantiers/ChantierListPage'
-import ChantierFormPage from './pages/chantiers/ChantierFormPage'
+import ChantierListPage   from './pages/chantiers/ChantierListPage'
+import ChantierFormPage   from './pages/chantiers/ChantierFormPage'
+import ChantierDetailPage from './pages/chantiers/ChantierDetailPage'
+import VehiculeListPage   from './pages/vehicules/VehiculeListPage'
+import VehiculeFormPage   from './pages/vehicules/VehiculeFormPage'
+import PlanningPage       from './pages/planning/PlanningPage'
+import PointagePage       from './pages/pointage/PointagePage'
 import ClientsPage from './pages/clients/ClientsPage'
 import FactureListPage from './pages/factures/FactureListPage'
 import FactureNewPage  from './pages/factures/FactureNewPage'
@@ -86,7 +91,13 @@ function AppRoutes() {
           <Route path="/devis/:id/edit"         element={<DevisEditPage />} />
           <Route path="/chantiers"              element={<ChantierListPage />} />
           <Route path="/chantiers/nouveau"      element={<ChantierFormPage />} />
+          <Route path="/chantiers/:id"          element={<ChantierDetailPage />} />
           <Route path="/chantiers/:id/edit"     element={<ChantierFormPage />} />
+          <Route path="/vehicules"              element={<VehiculeListPage />} />
+          <Route path="/vehicules/nouveau"      element={<VehiculeFormPage />} />
+          <Route path="/vehicules/:id/edit"     element={<VehiculeFormPage />} />
+          <Route path="/planning"               element={<PlanningPage />} />
+          <Route path="/pointage"               element={<PointagePage />} />
           <Route path="/clients"                element={<ClientsPage />} />
           <Route path="/factures"               element={<FactureListPage />} />
           <Route path="/factures/nouvelle"      element={<FactureNewPage />} />

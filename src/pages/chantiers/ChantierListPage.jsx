@@ -151,7 +151,7 @@ export default function ChantierListPage() {
               {filtered.map(c => (
                 <tr key={c.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3">
-                    <p className="font-medium text-gray-900">{c.nom}</p>
+                    <Link to={`/chantiers/${c.id}`} className="font-medium text-gray-900 hover:text-primary-600 transition-colors">{c.nom}</Link>
                     {c.adresse && <p className="text-xs text-gray-400 mt-0.5 truncate max-w-[200px]">{c.adresse}</p>}
                   </td>
                   <td className="px-4 py-3 text-gray-500 hidden md:table-cell">{c.clients?.nom || '—'}</td>

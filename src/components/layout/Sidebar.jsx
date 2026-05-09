@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, FileText, HardHat, Users, Receipt, Settings, LogOut, X } from 'lucide-react'
+import { LayoutDashboard, FileText, HardHat, Users, Receipt, BarChart2, FileMinus, Settings, LogOut, X, Truck, CalendarDays, Timer } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import toast from 'react-hot-toast'
 
@@ -9,6 +9,14 @@ const nav = [
   { to: '/chantiers', icon: HardHat,          label: 'Chantiers'       },
   { to: '/clients',   icon: Users,            label: 'Clients'         },
   { to: '/factures',  icon: Receipt,          label: 'Facturation'     },
+  { to: '/avoirs',    icon: FileMinus,        label: 'Avoirs'          },
+  { to: '/rapports',  icon: BarChart2,        label: 'Rapports'        },
+]
+
+const navTerrain = [
+  { to: '/vehicules', icon: Truck,        label: 'Véhicules'     },
+  { to: '/planning',  icon: CalendarDays, label: 'Planning'      },
+  { to: '/pointage',  icon: Timer,        label: 'Pointage'      },
 ]
 
 export default function Sidebar({ open, onClose }) {
@@ -42,9 +50,21 @@ export default function Sidebar({ open, onClose }) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5">
-        <p className="px-3 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Menu</p>
+      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+        <p className="px-3 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Gestion</p>
         {nav.map(({ to, icon: Icon, label }) => (
+          <NavLink
+            key={to}
+            to={to}
+            onClick={onClose}
+            className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+          >
+            <Icon size={16} />
+            {label}
+          </NavLink>
+        ))}
+        <p className="px-3 mt-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Terrain</p>
+        {navTerrain.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
             to={to}

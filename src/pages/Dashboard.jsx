@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { FileText, TrendingUp, CheckCircle, Clock, Plus, HardHat, Receipt, Euro } from 'lucide-react'
+import { FileText, TrendingUp, CheckCircle, Clock, Plus, HardHat, Receipt, Euro, Truck, AlertTriangle, CalendarDays } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
 import Badge from '../components/ui/Badge'
@@ -42,30 +42,46 @@ export default function Dashboard() {
       { data: chantiers },
       { data: factures },
       { data: facPaid },
+      { data: vehicules },
     ] = await Promise.all([
       supabase.from('devis').select('id, numero, statut, total_ttc, created_at, clients(nom)').order('created_at', { ascending: false }),
       supabase.from('devis').select('total_ttc').eq('statut', 'accepte'),
       supabase.from('chantiers').select('id, statut'),
       supabase.from('factures').select('id, numero, statut, total_ttc, created_at, clients(nom)').order('created_at', { ascending: false }),
       supabase.from('factures').select('total_ttc').eq('statut', 'payee'),
+      supabase.from('vehicules').select('id, statut, date_controle_tech, date_assurance, date_revision'),
     ])
 
-    const allDevis    = devis    || []
+    const allDevis     = devis     || []
     const allChantiers = chantiers || []
-    const allFactures = factures || []
+    const allFactures  = factures  || []
+    const allVehicules = vehicules || []
 
     const caDevisAccepte = (accepted || []).reduce((s, d) => s + (d.total_ttc || 0), 0)
     const caFacturePaye  = (facPaid  || []).reduce((s, f) => s + (f.total_ttc || 0), 0)
 
+    const today = new Date()
+    const in30  = new Date(); in30.setDate(today.getDate() + 30)
+    const vehiculesAlertes = allVehicules.filter(v => {
+      return ['date_controle_tech', 'date_assurance', 'date_revision'].some(field => {
+        if (!v[field]) return false
+        const d = new Date(v[field])
+        return d <= in30
+      })
+    }).length
+
     setStats({
-      devisTotal:      allDevis.length,
-      devisEnCours:    allDevis.filter(d => d.statut === 'envoye').length,
+      devisTotal:        allDevis.length,
+      devisEnCours:      allDevis.filter(d => d.statut === 'envoye').length,
       caDevisAccepte,
-      chantiersEnCours: allChantiers.filter(c => c.statut === 'en_cours').length,
+      chantiersEnCours:  allChantiers.filter(c => c.statut === 'en_cours').length,
       chantiersTermines: allChantiers.filter(c => c.statut === 'termine').length,
-      facturesTotal:    allFactures.length,
-      facturesEnRetard: allFactures.filter(f => f.statut === 'en_retard').length,
+      facturesTotal:     allFactures.length,
+      facturesEnRetard:  allFactures.filter(f => f.statut === 'en_retard').length,
       caFacturePaye,
+      vehiculesTotal:    allVehicules.length,
+      vehiculesEnService: allVehicules.filter(v => v.statut === 'en_service').length,
+      vehiculesAlertes,
     })
 
     setRecentDevis(allDevis.slice(0, 4))
@@ -113,6 +129,25 @@ export default function Dashboard() {
           <StatCard icon={Euro}        label="CA encaissé"        value={euro(stats.caFacturePaye)} color="bg-green-600"   sub="Factures payées" />
           <StatCard icon={HardHat}     label="Chantiers terminés" value={stats.chantiersTermines}   color="bg-teal-500" />
           <StatCard icon={Clock}       label="Factures en retard" value={stats.facturesEnRetard}    color="bg-red-500"    sub="À relancer" />
+        </div>
+      </div>
+
+      {/* Stats row 3 — Terrain */}
+      <div>
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Terrain</p>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard icon={Truck}         label="Véhicules / matériel"  value={stats.vehiculesTotal}      color="bg-slate-600" />
+          <StatCard icon={Truck}         label="En service"            value={stats.vehiculesEnService}  color="bg-blue-500"  sub="Actuellement déployés" />
+          <StatCard icon={AlertTriangle} label="Alertes maintenance"   value={stats.vehiculesAlertes}    color={stats.vehiculesAlertes > 0 ? 'bg-amber-500' : 'bg-gray-400'} sub="Échéances dans 30j" />
+          <Link to="/planning" className="card p-5 flex items-start gap-4 hover:shadow-md transition-shadow group">
+            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-teal-500 shrink-0">
+              <CalendarDays size={18} className="text-white" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-medium text-gray-500">Planning</p>
+              <p className="text-sm font-bold text-gray-900 mt-0.5 group-hover:text-teal-600">Voir la semaine →</p>
+            </div>
+          </Link>
         </div>
       </div>
 
