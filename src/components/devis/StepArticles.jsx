@@ -1,8 +1,10 @@
+import { useState } from 'react'
 import { useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Plus, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Plus, Trash2, ChevronLeft, ChevronRight, BookOpen, ChevronDown, ChevronUp } from 'lucide-react'
 import Button from '../ui/Button'
+import { getCatalogueByMetier, METIER_LABELS } from '../../lib/catalogue-prestations'
 
 const ligneSchema = z.object({
   designation: z.string().min(1, 'Requis'),
@@ -84,6 +86,56 @@ function LigneRow({ index, register, errors, remove, control }) {
   )
 }
 
+function CatalogueRapide({ onInsert }) {
+  const [open, setOpen] = useState(false)
+  const metier = localStorage.getItem('cp_metier') || 'autre'
+  const categories = getCatalogueByMetier(metier)
+  const label = METIER_LABELS[metier] || 'BTP'
+
+  if (categories.length === 0) return null
+
+  return (
+    <div className="border border-gray-200 rounded-lg overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors text-sm font-medium text-gray-700"
+      >
+        <span className="flex items-center gap-2">
+          <BookOpen size={14} className="text-primary-500" />
+          Catalogue {label} — insérer une prestation
+        </span>
+        {open ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+      </button>
+
+      {open && (
+        <div className="divide-y divide-gray-100 max-h-72 overflow-y-auto">
+          {categories.map(cat => (
+            <div key={cat.categorie}>
+              <p className="px-4 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider bg-gray-50">
+                {cat.categorie}
+              </p>
+              {cat.items.map((item, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => { onInsert(item); setOpen(false) }}
+                  className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-primary-50 text-left group transition-colors"
+                >
+                  <span className="text-sm text-gray-700 group-hover:text-primary-700 flex-1 pr-4">{item.designation}</span>
+                  <span className="text-xs font-semibold text-gray-500 group-hover:text-primary-600 shrink-0">
+                    {item.pu_ht} € HT
+                  </span>
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function StepArticles({ data, onNext, onBack }) {
   const { register, control, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
@@ -134,15 +186,19 @@ export default function StepArticles({ data, onNext, onBack }) {
           <p className="text-xs text-red-600">{errors.lignes.root.message}</p>
         )}
 
-        {/* Ajouter ligne */}
-        <button
-          type="button"
-          onClick={() => append({ designation: '', quantite: 1, pu_ht: '' })}
-          className="flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-700 py-1"
-        >
-          <Plus size={15} />
-          Ajouter un article
-        </button>
+        {/* Ajouter ligne + catalogue */}
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={() => append({ designation: '', quantite: 1, pu_ht: '' })}
+            className="flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-700 py-1"
+          >
+            <Plus size={15} />
+            Ajouter un article
+          </button>
+        </div>
+
+        <CatalogueRapide onInsert={item => append({ designation: item.designation, quantite: item.quantite, pu_ht: item.pu_ht })} />
 
         {/* Navigation */}
         <div className="flex justify-between pt-2 border-t border-gray-100">

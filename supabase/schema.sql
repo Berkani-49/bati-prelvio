@@ -22,7 +22,7 @@ create table if not exists devis (
   id         uuid primary key default gen_random_uuid(),
   user_id    uuid references auth.users(id) on delete cascade not null,
   client_id  uuid references clients(id) on delete set null,
-  numero     text unique not null,
+  numero     text not null,
   statut     text not null default 'brouillon'
                check (statut in ('brouillon', 'envoye', 'accepte', 'refuse')),
   total_ht   numeric(12, 2) default 0,
@@ -119,4 +119,5 @@ create index if not exists idx_clients_user    on clients(user_id);
 create index if not exists idx_devis_user      on devis(user_id);
 create index if not exists idx_devis_client    on devis(client_id);
 create index if not exists idx_devis_statut    on devis(statut);
+alter table devis add constraint devis_user_numero_unique unique (user_id, numero);
 create index if not exists idx_lignes_devis_id on lignes_devis(devis_id);

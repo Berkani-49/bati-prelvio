@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useParams, Link } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -22,14 +22,16 @@ const schema = z.object({
 })
 
 export default function ChantierFormPage() {
-  const { id }          = useParams()
-  const isEdit          = !!id
-  const { user }        = useAuth()
-  const navigate        = useNavigate()
-  const [loading, setLoading]   = useState(isEdit)
-  const [clients, setClients]   = useState([])
+  const { id }              = useParams()
+  const [searchParams]      = useSearchParams()
+  const fromDevisId         = searchParams.get('from_devis')
+  const isEdit              = !!id
+  const { effectiveUserId } = useAuth()
+  const navigate            = useNavigate()
+  const [loading, setLoading] = useState(isEdit)
+  const [clients, setClients] = useState([])
 
-  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({
+  const { register, handleSubmit, reset, setValue, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
       nom: '', client_id: '', adresse: '',
@@ -61,8 +63,19 @@ export default function ChantierFormPage() {
           })
           setLoading(false)
         })
+    } else if (fromDevisId) {
+      supabase
+        .from('devis')
+        .select('client_id, clients(nom), numero')
+        .eq('id', fromDevisId)
+        .single()
+        .then(({ data }) => {
+          if (!data) return
+          setValue('client_id', data.client_id || '')
+          setValue('nom', data.clients?.nom ? `Chantier — ${data.clients.nom}` : `Chantier — ${data.numero}`)
+        })
     }
-  }, [id, isEdit, navigate, reset])
+  }, [id, isEdit, fromDevisId, navigate, reset, setValue])
 
   async function onSubmit(data) {
     try {
@@ -78,7 +91,7 @@ export default function ChantierFormPage() {
         if (error) throw error
         toast.success('Chantier modifié')
       } else {
-        const { error } = await supabase.from('chantiers').insert({ ...payload, user_id: user.id })
+        const { error } = await supabase.from('chantiers').insert({ ...payload, user_id: effectiveUserId })
         if (error) throw error
         toast.success('Chantier créé')
       }
@@ -91,7 +104,7 @@ export default function ChantierFormPage() {
   if (loading) return <div className="flex items-center justify-center h-64"><Spinner /></div>
 
   return (
-    <div className="p-6 max-w-2xl space-y-6">
+    <div className="p-4 md:p-6 max-w-2xl space-y-6">
       <div className="flex items-center gap-3">
         <Link
           to="/chantiers"

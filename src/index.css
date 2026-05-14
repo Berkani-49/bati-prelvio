@@ -4,11 +4,15 @@
 
 @layer base {
   * {
-    @apply border-gray-200;
+    @apply border-gray-200 dark:border-gray-700;
   }
   body {
-    @apply bg-gray-50 text-gray-900 antialiased;
+    @apply bg-gray-50 text-gray-900 antialiased dark:bg-gray-950 dark:text-gray-100;
     font-family: 'Inter', system-ui, sans-serif;
+  }
+  /* Safe area iOS */
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0);
   }
 }
 
@@ -20,12 +24,81 @@
     @apply text-white bg-slate-800;
   }
   .card {
-    @apply bg-white rounded-xl border border-gray-200 shadow-card;
+    @apply bg-white rounded-xl border border-gray-200 shadow-card
+           dark:bg-gray-900 dark:border-gray-700 dark:shadow-none;
   }
   .section-title {
-    @apply text-lg font-semibold text-gray-900;
+    @apply text-lg font-semibold text-gray-900 dark:text-gray-100;
   }
   .form-label {
-    @apply block text-sm font-medium text-gray-700 mb-1;
+    @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1;
+  }
+}
+
+/* ── Dark mode global — évite de modifier chaque composant ─────── */
+@layer utilities {
+  /* Inputs & selects */
+  .dark input:not([type='checkbox']):not([type='radio']):not([type='range']),
+  .dark select,
+  .dark textarea {
+    background-color: rgb(17 24 39) !important; /* gray-900 */
+    color: rgb(243 244 246) !important;          /* gray-100 */
+    border-color: rgb(55 65 81) !important;      /* gray-700 */
+  }
+  .dark input::placeholder,
+  .dark textarea::placeholder {
+    color: rgb(107 114 128) !important;          /* gray-500 */
+  }
+
+  /* Tables */
+  .dark table thead tr {
+    background-color: rgb(17 24 39) !important;
+  }
+  .dark table tbody tr:hover {
+    background-color: rgb(31 41 55) !important; /* gray-800 */
+  }
+  .dark table td,
+  .dark table th {
+    color: rgb(209 213 219) !important;         /* gray-300 */
+    border-color: rgb(55 65 81) !important;
+  }
+
+  /* Headers page */
+  .dark h1 { color: rgb(243 244 246) !important; }
+  .dark h2 { color: rgb(229 231 235) !important; }
+  .dark p.text-gray-500  { color: rgb(107 114 128) !important; }
+  .dark p.text-gray-900  { color: rgb(243 244 246) !important; }
+  .dark p.text-gray-700  { color: rgb(209 213 219) !important; }
+
+  /* Backgrounds courants */
+  .dark .bg-white          { background-color: rgb(17 24 39) !important; }
+  .dark .bg-gray-50        { background-color: rgb(3 7 18) !important; }
+  .dark .bg-gray-100       { background-color: rgb(31 41 55) !important; }
+
+  /* Borders */
+  .dark .border-gray-200   { border-color: rgb(55 65 81) !important; }
+  .dark .border-gray-100   { border-color: rgb(31 41 55) !important; }
+
+  /* Textes courants */
+  .dark .text-gray-900     { color: rgb(243 244 246) !important; }
+  .dark .text-gray-700     { color: rgb(209 213 219) !important; }
+  .dark .text-gray-600     { color: rgb(156 163 175) !important; }
+  .dark .text-gray-500     { color: rgb(107 114 128) !important; }
+  .dark .text-gray-400     { color: rgb(75 85 99) !important; }
+
+  /* Hover states */
+  .dark .hover\:bg-gray-50:hover  { background-color: rgb(31 41 55) !important; }
+  .dark .hover\:bg-gray-100:hover { background-color: rgb(55 65 81) !important; }
+
+  /* Bottom nav */
+  .dark nav.fixed.bottom-0 {
+    background-color: rgb(17 24 39) !important;
+    border-color: rgb(55 65 81) !important;
+  }
+
+  /* Modals / overlays */
+  .dark .bg-white.rounded-2xl,
+  .dark .bg-white.rounded-xl {
+    background-color: rgb(17 24 39) !important;
   }
 }

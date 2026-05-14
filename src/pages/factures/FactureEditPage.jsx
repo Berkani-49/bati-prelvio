@@ -93,7 +93,8 @@ export default function FactureEditPage() {
 
       if (fErr) throw fErr
 
-      await supabase.from('lignes_facture').delete().eq('facture_id', id)
+      const { error: delErr } = await supabase.from('lignes_facture').delete().eq('facture_id', id)
+      if (delErr) throw delErr
 
       const { error: lErr } = await supabase.from('lignes_facture').insert(
         lignes.map(l => ({
@@ -118,7 +119,7 @@ export default function FactureEditPage() {
   if (loading) return <div className="flex items-center justify-center h-64"><Spinner /></div>
 
   return (
-    <div className="p-6 max-w-3xl space-y-6">
+    <div className="p-4 md:p-6 max-w-3xl space-y-6">
       <div className="flex items-center gap-3">
         <Link to="/factures" className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors">
           <ArrowLeft size={18} />

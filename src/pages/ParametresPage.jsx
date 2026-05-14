@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Building2, Save, Trash2, Upload, X, Users, UserPlus, Mail, CheckCircle, Clock, Zap, Crown } from 'lucide-react'
+import { Building2, Save, Trash2, Upload, X, Users, UserPlus, Mail, CheckCircle, Clock, Zap, Crown, Wrench, Bell, BellOff } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
 import { useSubscription } from '../hooks/useSubscription'
+import { usePushNotifications } from '../hooks/usePushNotifications'
 import Input from '../components/ui/Input'
 import Button from '../components/ui/Button'
 import Spinner from '../components/ui/Spinner'
@@ -19,6 +20,7 @@ const schema = z.object({
   tel:     z.string().optional().default(''),
   adresse: z.string().optional().default(''),
   siret:   z.string().optional().default(''),
+  metier:  z.enum(['plombier', 'electricien', 'autre']).optional().default('autre'),
 })
 
 function syncLocalStorage(data) {
@@ -27,6 +29,7 @@ function syncLocalStorage(data) {
   localStorage.setItem('cp_tel',     data.tel     || '')
   localStorage.setItem('cp_adresse', data.adresse || '')
   localStorage.setItem('cp_siret',   data.siret   || '')
+  localStorage.setItem('cp_metier',  data.metier  || 'autre')
 }
 
 export default function ParametresPage() {
@@ -34,6 +37,7 @@ export default function ParametresPage() {
   const navigate                  = useNavigate()
   const fileInputRef              = useRef(null)
   const { isPro, loading: subLoading } = useSubscription()
+  const { supported: pushSupported, subscribed: pushSubscribed, loading: pushLoading, subscribe: pushSubscribe, unsubscribe: pushUnsubscribe } = usePushNotifications(user?.id)
   const [portalLoading, setPortalLoading]    = useState(false)
 
   const [loading, setLoading]           = useState(true)
@@ -48,9 +52,9 @@ export default function ParametresPage() {
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviting, setInviting]       = useState(false)
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm({
+  const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
-    defaultValues: { nom: '', email: '', tel: '', adresse: '', siret: '' },
+    defaultValues: { nom: '', email: '', tel: '', adresse: '', siret: '', metier: 'autre' },
   })
 
   useEffect(() => {
@@ -62,7 +66,7 @@ export default function ParametresPage() {
         .maybeSingle()
 
       if (data) {
-        reset({ nom: data.nom || '', email: data.email || '', tel: data.tel || '', adresse: data.adresse || '', siret: data.siret || '' })
+        reset({ nom: data.nom || '', email: data.email || '', tel: data.tel || '', adresse: data.adresse || '', siret: data.siret || '', metier: data.metier || 'autre' })
         syncLocalStorage(data)
         if (data.logo_url) setLogoUrl(data.logo_url)
       }
@@ -182,6 +186,26 @@ export default function ParametresPage() {
     }
   }
 
+  const [pwForm, setPwForm]     = useState({ current: '', next: '', confirm: '' })
+  const [pwSaving, setPwSaving] = useState(false)
+
+  async function handleChangePassword(e) {
+    e.preventDefault()
+    if (pwForm.next.length < 8) { toast.error('Mot de passe trop court (min 8 caractères)'); return }
+    if (pwForm.next !== pwForm.confirm) { toast.error('Les mots de passe ne correspondent pas'); return }
+    setPwSaving(true)
+    try {
+      const { error } = await supabase.auth.updateUser({ password: pwForm.next })
+      if (error) throw error
+      toast.success('Mot de passe mis à jour')
+      setPwForm({ current: '', next: '', confirm: '' })
+    } catch (err) {
+      toast.error(err.message || 'Erreur')
+    } finally {
+      setPwSaving(false)
+    }
+  }
+
   async function handleDeleteAccount() {
     setDeleting(true)
     try {
@@ -198,7 +222,7 @@ export default function ParametresPage() {
   if (loading) return <div className="flex items-center justify-center h-64"><Spinner /></div>
 
   return (
-    <div className="p-6 max-w-2xl space-y-6">
+    <div className="p-4 md:p-6 max-w-2xl space-y-6">
       <div className="flex items-center gap-3">
         <div className="flex items-center justify-center w-10 h-10 bg-primary-100 rounded-xl">
           <Building2 size={20} className="text-primary-600" />
@@ -239,6 +263,40 @@ export default function ParametresPage() {
       {/* Informations */}
       <form onSubmit={handleSubmit(onSubmit)} className="card p-6 space-y-4">
         <h2 className="section-title">Informations entreprise</h2>
+
+        {/* Métier */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1.5">
+            <Wrench size={13} className="text-gray-400" /> Votre métier
+          </label>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { value: 'plombier',    label: 'Plombier',    emoji: '🔧' },
+              { value: 'electricien', label: 'Électricien', emoji: '⚡' },
+              { value: 'autre',       label: 'Autre BTP',   emoji: '🏗️' },
+            ].map(opt => {
+              const selected = watch('metier') === opt.value
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setValue('metier', opt.value, { shouldDirty: true })}
+                  className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border-2 text-sm font-medium transition-all ${
+                    selected
+                      ? 'border-primary-500 bg-primary-50 text-primary-700'
+                      : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                  }`}
+                >
+                  <span>{opt.emoji}</span>
+                  <span>{opt.label}</span>
+                </button>
+              )
+            })}
+          </div>
+          <input type="hidden" {...register('metier')} />
+          <p className="text-xs text-gray-400 mt-1.5">Personnalise votre catalogue de prestations dans les devis.</p>
+        </div>
+
         <Input label="Nom de l'entreprise *" placeholder="Bâti Pro SARL" error={errors.nom?.message} {...register('nom')} />
         <div className="grid grid-cols-2 gap-4">
           <Input label="Numéro BCE" placeholder="0XXX.XXX.XXX" {...register('siret')} />
@@ -350,7 +408,7 @@ export default function ParametresPage() {
           </div>
         ) : (
           <div className="space-y-3">
-            <p className="text-sm text-gray-500">Vous êtes sur le plan gratuit (5 devis/mois). Passez Pro pour tout débloquer.</p>
+            <p className="text-sm text-gray-500">Vous êtes sur le plan gratuit (10 devis / 3 factures par mois). Passez Pro pour tout débloquer.</p>
             <button
               type="button"
               onClick={() => navigate('/checkout')}
@@ -361,6 +419,72 @@ export default function ParametresPage() {
             </button>
           </div>
         )}
+      </div>
+
+      {/* Notifications push */}
+      {pushSupported && (
+        <div className="card p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="section-title mb-1">Notifications push</h2>
+              <p className="text-sm text-gray-500">
+                Recevez des alertes sur votre téléphone : factures en retard, devis sans réponse.
+              </p>
+              {pushSubscribed && (
+                <p className="text-xs text-green-600 font-medium mt-2 flex items-center gap-1">
+                  <Bell size={12} /> Notifications activées
+                </p>
+              )}
+            </div>
+            <button
+              onClick={pushSubscribed ? pushUnsubscribe : pushSubscribe}
+              disabled={pushLoading}
+              className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50 ${
+                pushSubscribed
+                  ? 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                  : 'bg-primary-600 hover:bg-primary-700 text-white'
+              }`}
+            >
+              {pushLoading ? (
+                <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+              ) : pushSubscribed ? (
+                <><BellOff size={15} /> Désactiver</>
+              ) : (
+                <><Bell size={15} /> Activer</>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Changer mot de passe */}
+      <div className="card p-6">
+        <h2 className="section-title mb-4">Mot de passe</h2>
+        <form onSubmit={handleChangePassword} className="space-y-4 max-w-sm">
+          <div>
+            <label className="form-label">Nouveau mot de passe</label>
+            <input
+              type="password"
+              value={pwForm.next}
+              onChange={e => setPwForm(f => ({ ...f, next: e.target.value }))}
+              placeholder="Min. 8 caractères"
+              className="w-full h-9 px-3 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            />
+          </div>
+          <div>
+            <label className="form-label">Confirmer le mot de passe</label>
+            <input
+              type="password"
+              value={pwForm.confirm}
+              onChange={e => setPwForm(f => ({ ...f, confirm: e.target.value }))}
+              placeholder="Répétez le mot de passe"
+              className="w-full h-9 px-3 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            />
+          </div>
+          <Button type="submit" size="sm" loading={pwSaving} disabled={!pwForm.next || !pwForm.confirm}>
+            <Save size={14} /> Changer le mot de passe
+          </Button>
+        </form>
       </div>
 
       {/* Zone danger */}

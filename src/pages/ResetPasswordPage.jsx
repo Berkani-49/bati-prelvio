@@ -12,8 +12,13 @@ export default function ResetPasswordPage() {
   const navigate                  = useNavigate()
 
   useEffect(() => {
+    // The Supabase client may have already processed the hash before this component mounted
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) setReady(true)
+    })
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY') setReady(true)
+      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') setReady(true)
     })
     return () => subscription.unsubscribe()
   }, [])

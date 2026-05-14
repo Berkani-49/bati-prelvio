@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Clock, Plus, Trash2, X, Save, Search, Timer } from 'lucide-react'
+import { Clock, Plus, Trash2, X, Save, Search, Timer, FileDown } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
+import { downloadCSV } from '../../lib/csv'
 import Button from '../../components/ui/Button'
 import Spinner from '../../components/ui/Spinner'
 import ConfirmModal from '../../components/ui/ConfirmModal'
@@ -135,8 +136,34 @@ export default function PointagePage() {
   }, 0)
   const totalHeures = totalMin > 0 ? `${Math.floor(totalMin / 60)}h${String(totalMin % 60).padStart(2, '0')}` : '—'
 
+  function exportPointageCSV() {
+    downloadCSV(
+      `pointage-${new Date().toISOString().slice(0, 10)}.csv`,
+      ['Ouvrier', 'Chantier', 'Date', 'Début', 'Fin', 'Pause (min)', 'Durée', 'Notes'],
+      filtered.map(p => {
+        const [hd, md] = (p.heure_debut || '0:0').split(':').map(Number)
+        const [hf, mf] = (p.heure_fin   || '0:0').split(':').map(Number)
+        const min = p.heure_debut && p.heure_fin
+          ? (hf * 60 + mf) - (hd * 60 + md) - (p.pause_min || 0)
+          : 0
+        const duree = min > 0 ? `${Math.floor(min / 60)}h${String(min % 60).padStart(2, '0')}` : ''
+        return [
+          p.ouvrier_nom,
+          p.chantiers?.nom || '',
+          new Date(p.date + 'T12:00:00').toLocaleDateString('fr-FR'),
+          p.heure_debut?.slice(0, 5) || '',
+          p.heure_fin?.slice(0, 5)   || '',
+          p.pause_min || 0,
+          duree,
+          p.notes || '',
+        ]
+      })
+    )
+    toast.success('Export CSV téléchargé')
+  }
+
   return (
-    <div className="p-6 max-w-5xl space-y-5">
+    <div className="p-4 md:p-6 max-w-5xl space-y-5">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-gray-900">Pointage terrain</h1>
@@ -145,7 +172,14 @@ export default function PointagePage() {
             {filtered.length > 0 && <span className="ml-2 font-medium text-gray-700">· {totalHeures} total</span>}
           </p>
         </div>
-        <Button size="sm" onClick={openNew}><Plus size={14} /> Nouveau pointage</Button>
+        <div className="flex items-center gap-2">
+          {filtered.length > 0 && (
+            <Button size="sm" variant="secondary" onClick={exportPointageCSV}>
+              <FileDown size={14} /> Export CSV
+            </Button>
+          )}
+          <Button size="sm" onClick={openNew}><Plus size={14} /> Nouveau pointage</Button>
+        </div>
       </div>
 
       {/* Filtres */}
@@ -219,7 +253,7 @@ export default function PointagePage() {
                     </td>
                     <td className="px-4 py-3 text-gray-500 hidden md:table-cell">{p.chantiers?.nom || '—'}</td>
                     <td className="px-4 py-3 text-gray-600">
-                      {new Date(p.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      {new Date(p.date + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </td>
                     <td className="px-4 py-3 text-center text-gray-500 hidden sm:table-cell">
                       {p.heure_debut && p.heure_fin

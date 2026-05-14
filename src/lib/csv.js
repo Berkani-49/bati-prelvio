@@ -53,8 +53,46 @@ export function exportFacturesCSV(factures) {
       (f.total_ht  || 0).toFixed(2),
       (f.total_tva || 0).toFixed(2),
       (f.total_ttc || 0).toFixed(2),
-      f.date_echeance ? new Date(f.date_echeance).toLocaleDateString('fr-FR') : '',
+      f.date_echeance ? new Date(f.date_echeance + 'T12:00:00').toLocaleDateString('fr-FR') : '',
       new Date(f.created_at).toLocaleDateString('fr-FR'),
     ])
+  )
+}
+
+// Journal des ventes — format compatible Sage/EBP/comptable
+export function exportJournalVentes(factures) {
+  const rows = factures.map(f => {
+    const date    = new Date(f.created_at).toLocaleDateString('fr-FR')
+    const ht      = (f.total_ht  || 0).toFixed(2)
+    const tva     = (f.total_tva || 0).toFixed(2)
+    const ttc     = (f.total_ttc || 0).toFixed(2)
+    const statut  = { brouillon: 'Brouillon', envoyee: 'Émise', payee: 'Payée', en_retard: 'En retard', annulee: 'Annulée' }[f.statut] || f.statut
+    const echeance = f.date_echeance ? new Date(f.date_echeance + 'T12:00:00').toLocaleDateString('fr-FR') : ''
+    return [
+      'VE',           // Code journal (Ventes)
+      date,           // Date de pièce
+      f.numero,       // N° de pièce
+      f.clients?.nom || '',  // Libellé / raison sociale client
+      f.clients?.email || '',
+      '411000',       // Compte client (plan comptable général)
+      ht,             // Base HT
+      tva,            // TVA collectée
+      ttc,            // Total TTC
+      '20',           // Taux TVA (%)
+      '445710',       // Compte TVA collectée (PCG)
+      '706000',       // Compte produit prestation (PCG)
+      echeance,       // Date d'échéance
+      statut,         // Statut paiement
+    ]
+  })
+
+  downloadCSV(
+    `journal-ventes-${new Date().toISOString().slice(0, 10)}.csv`,
+    [
+      'Journal', 'Date', 'N° Pièce', 'Client', 'Email client',
+      'Cpte client', 'Montant HT (€)', 'TVA (€)', 'Montant TTC (€)',
+      'Taux TVA (%)', 'Cpte TVA', 'Cpte produit', 'Échéance', 'Statut',
+    ],
+    rows
   )
 }

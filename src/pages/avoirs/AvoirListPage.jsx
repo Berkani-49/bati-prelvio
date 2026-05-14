@@ -85,7 +85,7 @@ export default function AvoirListPage() {
   const openAvoir = filtered.find(a => a.id === menuOpen)
 
   return (
-    <div className="p-6 max-w-5xl space-y-5">
+    <div className="p-4 md:p-6 max-w-5xl space-y-5">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-gray-900">Avoirs</h1>

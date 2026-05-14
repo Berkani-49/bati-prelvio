@@ -4,7 +4,7 @@ import { Plus, HardHat, MoreHorizontal, Search } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import Badge from '../../components/ui/Badge'
 import Button from '../../components/ui/Button'
-import Spinner from '../../components/ui/Spinner'
+import { SkeletonListPage } from '../../components/ui/Skeleton'
 import ConfirmModal from '../../components/ui/ConfirmModal'
 import toast from 'react-hot-toast'
 
@@ -84,8 +84,10 @@ export default function ChantierListPage() {
     return new Date(d).toLocaleDateString('fr-FR')
   }
 
+  if (loading) return <SkeletonListPage rows={5} />
+
   return (
-    <div className="p-6 max-w-5xl space-y-5">
+    <div className="p-4 md:p-6 max-w-5xl space-y-5">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-gray-900">Chantiers</h1>
@@ -122,9 +124,7 @@ export default function ChantierListPage() {
         </div>
       </div>
 
-      {loading ? (
-        <div className="flex justify-center py-16"><Spinner /></div>
-      ) : filtered.length === 0 ? (
+      {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 card">
           <HardHat size={40} className="text-gray-300 mb-3" />
           <p className="text-gray-500 font-medium">Aucun chantier trouvé</p>

@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Plus, Users, X, Search, Pencil, Trash2 } from 'lucide-react'
+import { Plus, Users, X, Search, Pencil, Trash2, Link2, Upload, FileDown } from 'lucide-react'
 import ConfirmModal from '../../components/ui/ConfirmModal'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
+import { downloadCSV } from '../../lib/csv'
 import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
 import Spinner from '../../components/ui/Spinner'
@@ -19,7 +20,7 @@ const schema = z.object({
 })
 
 function ClientModal({ client, onClose, onSaved }) {
-  const { user } = useAuth()
+  const { effectiveUserId } = useAuth()
   const isEdit = !!client?.id
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
@@ -44,7 +45,7 @@ function ClientModal({ client, onClose, onSaved }) {
       } else {
         const { error } = await supabase
           .from('clients')
-          .insert({ ...data, user_id: user.id })
+          .insert({ ...data, user_id: effectiveUserId })
         if (error) throw error
         toast.success('Client ajouté')
       }
@@ -106,11 +107,14 @@ function ClientModal({ client, onClose, onSaved }) {
 }
 
 export default function ClientsPage() {
+  const { effectiveUserId }     = useAuth()
   const [clients, setClients]   = useState([])
   const [loading, setLoading]   = useState(true)
   const [search, setSearch]     = useState('')
   const [modal, setModal]       = useState(null)
   const [confirmId, setConfirmId] = useState(null)
+  const [importing, setImporting] = useState(false)
+  const csvInputRef = useRef(null)
 
   useEffect(() => { fetchClients() }, [])
 
@@ -138,22 +142,107 @@ export default function ClientsPage() {
     toast.success('Client supprimé')
   }
 
+  function exportClientsCSV() {
+    downloadCSV(
+      `clients-${new Date().toISOString().slice(0, 10)}.csv`,
+      ['Nom', 'Email', 'Téléphone', 'Adresse'],
+      clients.map(c => [c.nom, c.email || '', c.tel || '', c.adresse || ''])
+    )
+    toast.success('Export CSV téléchargé')
+  }
+
+  function sanitize(str) {
+    if (!str) return ''
+    // Neutralise les injections CSV (=, +, -, @) et XSS basique
+    return str.replace(/^[=+\-@\t\r]/, '').replace(/[<>]/g, '').trim().slice(0, 255)
+  }
+
+  async function handleImportCSV(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Limite 2 Mo
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Fichier trop volumineux (max 2 Mo)')
+      if (csvInputRef.current) csvInputRef.current.value = ''
+      return
+    }
+    // Vérifier extension
+    if (!file.name.endsWith('.csv') && !file.name.endsWith('.txt')) {
+      toast.error('Format invalide — fichier .csv uniquement')
+      if (csvInputRef.current) csvInputRef.current.value = ''
+      return
+    }
+
+    setImporting(true)
+    const text = await file.text()
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean)
+    if (lines.length < 2) { toast.error('Fichier vide ou invalide'); setImporting(false); return }
+    if (lines.length > 5001) { toast.error('Max 5000 clients par import'); setImporting(false); return }
+
+    // Détecter le séparateur (virgule ou point-virgule)
+    const sep = lines[0].includes(';') ? ';' : ','
+    const headers = lines[0].split(sep).map(h => h.replace(/^"|"$/g, '').toLowerCase().trim())
+
+    const colIdx = {
+      nom:     headers.findIndex(h => ['nom', 'name', 'société', 'societe', 'client'].includes(h)),
+      email:   headers.findIndex(h => ['email', 'mail', 'e-mail'].includes(h)),
+      tel:     headers.findIndex(h => ['tel', 'téléphone', 'telephone', 'phone', 'mobile'].includes(h)),
+      adresse: headers.findIndex(h => ['adresse', 'address', 'adresse complète'].includes(h)),
+    }
+
+    if (colIdx.nom === -1) { toast.error('Colonne "Nom" introuvable dans le CSV'); setImporting(false); return }
+
+    const toInsert = []
+    for (const line of lines.slice(1)) {
+      const cols = line.split(sep).map(c => c.replace(/^"|"$/g, '').trim())
+      const nom = sanitize(cols[colIdx.nom])
+      if (!nom) continue
+      toInsert.push({
+        user_id: effectiveUserId,
+        nom,
+        email:   colIdx.email   !== -1 ? sanitize(cols[colIdx.email])   || null : null,
+        tel:     colIdx.tel     !== -1 ? sanitize(cols[colIdx.tel])     || null : null,
+        adresse: colIdx.adresse !== -1 ? sanitize(cols[colIdx.adresse]) || null : null,
+      })
+    }
+
+    if (!toInsert.length) { toast.error('Aucun client valide trouvé'); setImporting(false); return }
+
+    const { error } = await supabase.from('clients').insert(toInsert)
+    if (error) { toast.error('Erreur import : ' + error.message); setImporting(false); return }
+
+    toast.success(`${toInsert.length} client${toInsert.length > 1 ? 's' : ''} importé${toInsert.length > 1 ? 's' : ''}`)
+    setImporting(false)
+    if (csvInputRef.current) csvInputRef.current.value = ''
+    fetchClients()
+  }
+
   const filtered = clients.filter(c =>
     c.nom?.toLowerCase().includes(search.toLowerCase()) ||
     c.email?.toLowerCase().includes(search.toLowerCase())
   )
 
   return (
-    <div className="p-6 max-w-5xl space-y-5">
+    <div className="p-4 md:p-6 max-w-5xl space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-xl font-bold text-gray-900">Clients</h1>
           <p className="text-sm text-gray-500 mt-0.5">{clients.length} client{clients.length > 1 ? 's' : ''}</p>
         </div>
-        <Button size="sm" onClick={() => setModal({})}>
-          <Plus size={14} /> Nouveau client
-        </Button>
+        <div className="flex items-center gap-2">
+          <input ref={csvInputRef} type="file" accept=".csv" className="hidden" onChange={handleImportCSV} />
+          <Button size="sm" variant="secondary" onClick={() => csvInputRef.current?.click()} loading={importing}>
+            <Upload size={14} /> Import CSV
+          </Button>
+          <Button size="sm" variant="secondary" onClick={exportClientsCSV}>
+            <FileDown size={14} /> Export
+          </Button>
+          <Button size="sm" onClick={() => setModal({})}>
+            <Plus size={14} /> Nouveau client
+          </Button>
+        </div>
       </div>
 
       {/* Search */}
@@ -210,6 +299,17 @@ export default function ClientsPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1">
+                      <button
+                        onClick={() => {
+                          const url = `${window.location.origin}/portail/${c.portail_token || c.id}`
+                          navigator.clipboard.writeText(url)
+                          toast.success('Lien portail copié !')
+                        }}
+                        className="p-1.5 rounded hover:bg-blue-50 text-gray-400 hover:text-blue-600"
+                        title="Copier le lien portail client"
+                      >
+                        <Link2 size={14} />
+                      </button>
                       <button
                         onClick={() => setModal(c)}
                         className="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-700"

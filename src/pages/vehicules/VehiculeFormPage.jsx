@@ -100,7 +100,7 @@ export default function VehiculeFormPage() {
   if (loading) return <div className="flex items-center justify-center h-64"><Spinner /></div>
 
   return (
-    <div className="p-6 max-w-2xl space-y-6">
+    <div className="p-4 md:p-6 max-w-2xl space-y-6">
       <div className="flex items-center gap-3">
         <Link to="/vehicules" className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors">
           <ArrowLeft size={18} />

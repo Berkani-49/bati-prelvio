@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Search, UserPlus, ChevronRight } from 'lucide-react'
+import { Search, UserPlus, ChevronRight, AlertTriangle } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import Input from '../ui/Input'
 import Button from '../ui/Button'
@@ -15,16 +15,21 @@ const schema = z.object({
 })
 
 export default function StepClient({ data, onNext }) {
-  const [search, setSearch]       = useState('')
-  const [clients, setClients]     = useState([])
-  const [searching, setSearching] = useState(false)
-  const [mode, setMode]           = useState('search') // 'search' | 'new' | 'selected'
-  const debounceRef               = useRef(null)
+  const [search, setSearch]             = useState('')
+  const [clients, setClients]           = useState([])
+  const [searching, setSearching]       = useState(false)
+  const [mode, setMode]                 = useState('search') // 'search' | 'new' | 'selected'
+  const [selectedId, setSelectedId]     = useState(data?.client?.id || null)
+  const [existingMatch, setExistingMatch] = useState(null)
+  const debounceRef                     = useRef(null)
+  const dupCheckRef                     = useRef(null)
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm({
+  const { register, handleSubmit, reset, watch, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
     defaultValues: data?.client || {},
   })
+
+  const nomValue = watch('nom')
 
   useEffect(() => {
     if (data?.client) {
@@ -32,6 +37,22 @@ export default function StepClient({ data, onNext }) {
       setMode('selected')
     }
   }, [])
+
+  useEffect(() => {
+    if (mode !== 'new' || !nomValue || nomValue.length < 2) {
+      setExistingMatch(null)
+      return
+    }
+    clearTimeout(dupCheckRef.current)
+    dupCheckRef.current = setTimeout(async () => {
+      const { data: rows } = await supabase
+        .from('clients')
+        .select('*')
+        .ilike('nom', `%${nomValue}%`)
+        .limit(3)
+      setExistingMatch(rows?.length ? rows[0] : null)
+    }, 400)
+  }, [nomValue, mode])
 
   async function doSearch(term) {
     if (!term.trim()) { setClients([]); return }
@@ -46,6 +67,7 @@ export default function StepClient({ data, onNext }) {
   }
 
   function selectClient(client) {
+    setSelectedId(client.id)
     reset(client)
     setMode('selected')
     setSearch('')
@@ -53,7 +75,7 @@ export default function StepClient({ data, onNext }) {
   }
 
   function onSubmit(values) {
-    onNext({ client: values })
+    onNext({ client: { ...values, id: mode === 'selected' ? selectedId : undefined } })
   }
 
   return (
@@ -120,10 +142,27 @@ export default function StepClient({ data, onNext }) {
               <span className="text-sm text-primary-700 font-medium">Client sélectionné</span>
               <button
                 type="button"
-                onClick={() => { setMode('search'); reset({}) }}
+                onClick={() => { setMode('search'); reset({}); setSelectedId(null) }}
                 className="text-xs text-primary-600 hover:text-primary-800 underline"
               >
                 Changer
+              </button>
+            </div>
+          )}
+
+          {mode === 'new' && existingMatch && (
+            <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+              <AlertTriangle size={15} className="text-amber-600 mt-0.5 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-amber-800">Client similaire trouvé : {existingMatch.nom}</p>
+                <p className="text-xs text-amber-700 mt-0.5">{existingMatch.email || ''}{existingMatch.email && existingMatch.tel ? ' · ' : ''}{existingMatch.tel || ''}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => selectClient(existingMatch)}
+                className="shrink-0 text-xs font-semibold text-amber-700 hover:text-amber-900 underline"
+              >
+                Utiliser ce client
               </button>
             </div>
           )}

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -35,6 +35,9 @@ export default function LoginPage() {
   const [loading, setLoading]     = useState(false)
   const [emailSent, setEmailSent] = useState(false)
   const [resetSent, setResetSent] = useState(false)
+  const [cooldown, setCooldown]   = useState(0)
+  const attemptsRef               = useRef(0)
+  const cooldownRef               = useRef(null)
   const { signIn, signUp, resetPasswordForEmail } = useAuth()
   const navigate                  = useNavigate()
   const location                  = useLocation()
@@ -66,11 +69,24 @@ export default function LoginPage() {
     }
   }
 
+  function startCooldown(seconds) {
+    setCooldown(seconds)
+    clearInterval(cooldownRef.current)
+    cooldownRef.current = setInterval(() => {
+      setCooldown(prev => {
+        if (prev <= 1) { clearInterval(cooldownRef.current); return 0 }
+        return prev - 1
+      })
+    }, 1000)
+  }
+
   async function onSubmit({ email, password }) {
+    if (cooldown > 0) return
     setLoading(true)
     try {
       if (mode === 'login') {
         await signIn(email, password)
+        attemptsRef.current = 0
         navigate(nextPath)
       } else {
         const data = await signUp(email, password)
@@ -82,6 +98,11 @@ export default function LoginPage() {
         }
       }
     } catch (err) {
+      attemptsRef.current += 1
+      // Cooldown progressif : 5s après 3 échecs, 30s après 5, 60s après 7
+      if (attemptsRef.current >= 7) startCooldown(60)
+      else if (attemptsRef.current >= 5) startCooldown(30)
+      else if (attemptsRef.current >= 3) startCooldown(5)
       toast.error(translateError(err.message))
     } finally {
       setLoading(false)
@@ -288,11 +309,13 @@ export default function LoginPage() {
 
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || cooldown > 0}
                   className="w-full h-11 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed mt-2"
                 >
                   {loading ? (
                     <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  ) : cooldown > 0 ? (
+                    `Réessayer dans ${cooldown}s`
                   ) : (
                     <>
                       {mode === 'login' ? 'Se connecter' : 'Créer mon compte'}

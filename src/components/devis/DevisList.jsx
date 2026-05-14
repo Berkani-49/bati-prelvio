@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Plus, Download, MoreHorizontal, FileText, Search, Pencil, FileDown } from 'lucide-react'
+import { Plus, Download, MoreHorizontal, FileText, Search, Pencil, FileDown, HardHat, PenTool, CheckCircle, Square, CheckSquare, ChevronDown, Trash2, Receipt } from 'lucide-react'
 import ConfirmModal from '../ui/ConfirmModal'
 
 import { supabase } from '../../lib/supabase'
 import { generateDevisPDF, downloadPDF } from '../../lib/pdf'
 import { getEntrepriseData, fetchLogoBase64 } from '../../lib/entreprise'
 import { exportDevisCSV } from '../../lib/csv'
+import { sendSignatureRequestEmail } from '../../lib/email'
 import Badge from '../ui/Badge'
 import Button from '../ui/Button'
 import Spinner from '../ui/Spinner'
@@ -35,6 +36,8 @@ export default function DevisList() {
   const [menuOpen, setMenuOpen] = useState(null)
   const [menuPos, setMenuPos]   = useState({ top: 0, right: 0 })
   const [confirmId, setConfirmId] = useState(null)
+  const [selected, setSelected]   = useState(new Set())
+  const [bulkMenu, setBulkMenu]   = useState(false)
 
   useEffect(() => { fetchDevis() }, [filtre])
 
@@ -83,6 +86,24 @@ export default function DevisList() {
     setMenuOpen(null)
   }
 
+  async function handleRequestSignature(d) {
+    if (!d.clients?.email) { toast.error('Ce client n\'a pas d\'email enregistré'); setMenuOpen(null); return }
+    setMenuOpen(null)
+    try {
+      const { data: fresh } = await supabase.from('devis').select('signature_token').eq('id', d.id).single()
+      const signingUrl = `${window.location.origin}/signer/${fresh.signature_token}`
+      await sendSignatureRequestEmail({
+        to: d.clients.email,
+        clientName: d.clients.nom,
+        devisNumero: d.numero,
+        signingUrl,
+      })
+      toast.success(`Lien de signature envoyé à ${d.clients.email}`)
+    } catch (err) {
+      toast.error(err.message || 'Erreur envoi lien signature')
+    }
+  }
+
   function handleDelete(id) {
     setMenuOpen(null)
     setConfirmId(id)
@@ -103,8 +124,88 @@ export default function DevisList() {
 
   const openDevis = filtered.find(x => x.id === menuOpen)
 
+  // ── Sélection groupée ────────────────────────────────────────
+  function toggleSelect(id) {
+    setSelected(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
+  function toggleSelectAll() {
+    if (selected.size === filtered.length) {
+      setSelected(new Set())
+    } else {
+      setSelected(new Set(filtered.map(d => d.id)))
+    }
+  }
+
+  async function bulkUpdateStatut(statut) {
+    const ids = [...selected]
+    const { error } = await supabase.from('devis').update({ statut }).in('id', ids)
+    if (error) { toast.error('Erreur mise à jour'); return }
+    setDevis(prev => prev.map(d => selected.has(d.id) ? { ...d, statut } : d))
+    setSelected(new Set())
+    setBulkMenu(false)
+    toast.success(`${ids.length} devis mis à jour`)
+  }
+
+  async function bulkDelete() {
+    const ids = [...selected]
+    const { error } = await supabase.from('devis').delete().in('id', ids)
+    if (error) { toast.error('Erreur suppression'); return }
+    setDevis(prev => prev.filter(d => !selected.has(d.id)))
+    setSelected(new Set())
+    toast.success(`${ids.length} devis supprimés`)
+  }
+
+  const allSelected = filtered.length > 0 && selected.size === filtered.length
+  const someSelected = selected.size > 0
+
   return (
     <div className="space-y-4">
+      {/* Barre d'actions groupées */}
+      {someSelected && (
+        <div className="flex items-center gap-3 px-4 py-2.5 bg-primary-50 border border-primary-200 rounded-xl">
+          <span className="text-sm font-semibold text-primary-700">
+            {selected.size} sélectionné{selected.size > 1 ? 's' : ''}
+          </span>
+          <div className="flex items-center gap-2 ml-auto">
+            <div className="relative">
+              <button
+                onClick={() => setBulkMenu(o => !o)}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Changer statut <ChevronDown size={12} />
+              </button>
+              {bulkMenu && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setBulkMenu(false)} />
+                  <div className="absolute right-0 top-full mt-1 z-50 w-36 bg-white border border-gray-200 rounded-lg shadow-lg py-1">
+                    {['brouillon', 'envoye', 'accepte', 'refuse'].map(s => (
+                      <button key={s} onClick={() => bulkUpdateStatut(s)}
+                        className="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-gray-50">
+                        {STATUT_LABELS[s]}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+            <button
+              onClick={bulkDelete}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 border border-red-200 rounded-lg text-xs font-medium text-red-600 hover:bg-red-100"
+            >
+              <Trash2 size={12} /> Supprimer
+            </button>
+            <button onClick={() => setSelected(new Set())} className="text-xs text-gray-400 hover:text-gray-600 ml-1">
+              Annuler
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
@@ -164,34 +265,47 @@ export default function DevisList() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">N° Devis</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Client</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase hidden md:table-cell">Date</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Total TTC</th>
-                <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Statut</th>
-                <th className="px-4 py-3 w-16" />
+                <th className="px-3 py-3 w-8">
+                  <button onClick={toggleSelectAll} className="text-gray-400 hover:text-gray-700">
+                    {allSelected ? <CheckSquare size={16} className="text-primary-600" /> : <Square size={16} />}
+                  </button>
+                </th>
+                <th className="text-left px-3 py-3 text-xs font-semibold text-gray-500 uppercase">N° Devis</th>
+                <th className="text-left px-3 py-3 text-xs font-semibold text-gray-500 uppercase">Client</th>
+                <th className="text-left px-3 py-3 text-xs font-semibold text-gray-500 uppercase hidden md:table-cell">Date</th>
+                <th className="text-right px-3 py-3 text-xs font-semibold text-gray-500 uppercase">Total TTC</th>
+                <th className="text-center px-3 py-3 text-xs font-semibold text-gray-500 uppercase">Statut</th>
+                <th className="px-3 py-3 w-12" />
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filtered.map(d => (
-                <tr key={d.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3 font-medium text-gray-900">{d.numero}</td>
-                  <td className="px-4 py-3 text-gray-700">{d.clients?.nom || '—'}</td>
-                  <td className="px-4 py-3 text-gray-500 hidden md:table-cell">
-                    {new Date(d.created_at).toLocaleDateString('fr-FR')}
-                  </td>
-                  <td className="px-4 py-3 text-right font-semibold text-gray-900">{euro(d.total_ttc)}</td>
-                  <td className="px-4 py-3 text-center"><Badge statut={d.statut} /></td>
-                  <td className="px-4 py-3 text-right">
-                    <button
-                      onClick={e => toggleMenu(e, d.id)}
-                      className="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-700"
-                    >
-                      <MoreHorizontal size={16} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {filtered.map(d => {
+                const isSelected = selected.has(d.id)
+                return (
+                  <tr key={d.id} className={`transition-colors ${isSelected ? 'bg-primary-50' : 'hover:bg-gray-50'}`}>
+                    <td className="px-3 py-3">
+                      <button onClick={() => toggleSelect(d.id)} className="text-gray-400 hover:text-gray-700">
+                        {isSelected ? <CheckSquare size={16} className="text-primary-600" /> : <Square size={16} />}
+                      </button>
+                    </td>
+                    <td className="px-3 py-3 font-medium text-gray-900">{d.numero}</td>
+                    <td className="px-3 py-3 text-gray-700">{d.clients?.nom || '—'}</td>
+                    <td className="px-3 py-3 text-gray-500 hidden md:table-cell">
+                      {new Date(d.created_at).toLocaleDateString('fr-FR')}
+                    </td>
+                    <td className="px-3 py-3 text-right font-semibold text-gray-900">{euro(d.total_ttc)}</td>
+                    <td className="px-3 py-3 text-center"><Badge statut={d.statut} /></td>
+                    <td className="px-3 py-3 text-right">
+                      <button
+                        onClick={e => toggleMenu(e, d.id)}
+                        className="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-700"
+                      >
+                        <MoreHorizontal size={16} />
+                      </button>
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>
@@ -215,6 +329,35 @@ export default function DevisList() {
           >
             <Download size={14} /> Télécharger PDF
           </button>
+          {openDevis.statut === 'accepte' && (
+            <>
+              <button
+                onClick={() => { navigate(`/chantiers/nouveau?from_devis=${openDevis.id}`); setMenuOpen(null) }}
+                className="w-full text-left px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 flex items-center gap-2"
+              >
+                <HardHat size={14} /> Créer un chantier
+              </button>
+              <button
+                onClick={() => { navigate(`/factures/nouvelle?from_devis=${openDevis.id}`); setMenuOpen(null) }}
+                className="w-full text-left px-3 py-2 text-sm text-green-600 hover:bg-green-50 flex items-center gap-2"
+              >
+                <Receipt size={14} /> Créer une facture
+              </button>
+            </>
+          )}
+          {openDevis.statut === 'envoye' && !openDevis.signature_base64 && (
+            <button
+              onClick={() => handleRequestSignature(openDevis)}
+              className="w-full text-left px-3 py-2 text-sm text-violet-600 hover:bg-violet-50 flex items-center gap-2"
+            >
+              <PenTool size={14} /> Demander signature
+            </button>
+          )}
+          {openDevis.signature_base64 && (
+            <span className="flex items-center gap-2 px-3 py-2 text-sm text-green-600">
+              <CheckCircle size={14} /> Signé
+            </span>
+          )}
 
           <div className="h-px bg-gray-100 my-1" />
           <p className="px-3 py-1 text-xs font-semibold text-gray-400 uppercase">Changer statut</p>

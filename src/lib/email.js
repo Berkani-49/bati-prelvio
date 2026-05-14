@@ -14,3 +14,11 @@ export async function sendDevisEmail({ to, clientName, devisNumero, pdfBase64 })
 export async function sendFactureEmail({ to, clientName, factureNumero, pdfBase64 }) {
   return callEdgeFunction({ type: 'facture', to, clientName, numero: factureNumero, pdfBase64 })
 }
+
+export async function sendRelanceEmail({ to, clientName, factureNumero, pdfBase64, montantTTC, dateEcheance }) {
+  return callEdgeFunction({ type: 'relance', to, clientName, numero: factureNumero, pdfBase64, montantTTC, dateEcheance })
+}
+
+export async function sendSignatureRequestEmail({ to, clientName, devisNumero, signingUrl }) {
+  return callEdgeFunction({ type: 'signature_request', to, clientName, numero: devisNumero, signingUrl })
+}

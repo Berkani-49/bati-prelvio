@@ -1,16 +1,17 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, FileText, HardHat, Users, Receipt, BarChart2, FileMinus, Settings, LogOut, X, Truck, CalendarDays, Timer } from 'lucide-react'
+import { LayoutDashboard, FileText, HardHat, Users, Receipt, BarChart2, FileMinus, Settings, LogOut, X, Truck, CalendarDays, Timer, Wallet, Search, Sun, Moon } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import toast from 'react-hot-toast'
 
 const nav = [
-  { to: '/dashboard', icon: LayoutDashboard, label: 'Tableau de bord' },
-  { to: '/devis',     icon: FileText,         label: 'Devis'           },
-  { to: '/chantiers', icon: HardHat,          label: 'Chantiers'       },
-  { to: '/clients',   icon: Users,            label: 'Clients'         },
-  { to: '/factures',  icon: Receipt,          label: 'Facturation'     },
-  { to: '/avoirs',    icon: FileMinus,        label: 'Avoirs'          },
-  { to: '/rapports',  icon: BarChart2,        label: 'Rapports'        },
+  { to: '/dashboard',  icon: LayoutDashboard, label: 'Tableau de bord' },
+  { to: '/devis',      icon: FileText,         label: 'Devis'           },
+  { to: '/chantiers',  icon: HardHat,          label: 'Chantiers'       },
+  { to: '/clients',    icon: Users,            label: 'Clients'         },
+  { to: '/factures',   icon: Receipt,          label: 'Facturation'     },
+  { to: '/avoirs',     icon: FileMinus,        label: 'Avoirs'          },
+  { to: '/tresorerie', icon: Wallet,           label: 'Trésorerie'      },
+  { to: '/rapports',   icon: BarChart2,        label: 'Rapports'        },
 ]
 
 const navTerrain = [
@@ -19,9 +20,17 @@ const navTerrain = [
   { to: '/pointage',  icon: Timer,        label: 'Pointage'      },
 ]
 
-export default function Sidebar({ open, onClose }) {
+function getMetierLabel() {
+  const m = localStorage.getItem('cp_metier')
+  if (m === 'plombier')    return '🔧 Plombier'
+  if (m === 'electricien') return '⚡ Électricien'
+  return 'Gestion BTP'
+}
+
+export default function Sidebar({ open, onClose, onSearchOpen, onToggleDark, dark }) {
   const { signOut } = useAuth()
   const navigate    = useNavigate()
+  const metierLabel = getMetierLabel()
 
   async function handleSignOut() {
     await signOut()
@@ -40,7 +49,7 @@ export default function Sidebar({ open, onClose }) {
         />
         <div className="flex-1 min-w-0">
           <p className="text-white font-semibold text-sm leading-none">Bati Prelvio</p>
-          <p className="text-slate-500 text-xs mt-0.5">Gestion BTP</p>
+          <p className="text-slate-500 text-xs mt-0.5">{metierLabel}</p>
         </div>
         {onClose && (
           <button onClick={onClose} className="text-slate-400 hover:text-white md:hidden">
@@ -79,6 +88,23 @@ export default function Sidebar({ open, onClose }) {
 
       {/* Footer */}
       <div className="px-3 py-4 border-t border-slate-800 space-y-0.5">
+        {onSearchOpen && (
+          <button
+            onClick={() => { onSearchOpen(); onClose?.() }}
+            className="sidebar-link w-full justify-between"
+          >
+            <span className="flex items-center gap-3"><Search size={16} /> Rechercher</span>
+            <kbd className="text-slate-500 text-xs">⌘K</kbd>
+          </button>
+        )}
+        {onToggleDark && (
+          <button onClick={onToggleDark} className="sidebar-link w-full justify-between">
+            <span className="flex items-center gap-3">
+              {dark ? <Sun size={16} /> : <Moon size={16} />}
+              {dark ? 'Mode clair' : 'Mode sombre'}
+            </span>
+          </button>
+        )}
         <NavLink
           to="/parametres"
           onClick={onClose}

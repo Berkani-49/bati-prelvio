@@ -39,7 +39,7 @@ create table if not exists factures (
   user_id       uuid references auth.users(id) on delete cascade not null,
   client_id     uuid references clients(id) on delete set null,
   devis_id      uuid references devis(id) on delete set null,
-  numero        text unique not null,
+  numero        text not null,
   statut        text not null default 'brouillon'
                   check (statut in ('brouillon', 'envoyee', 'payee', 'en_retard')),
   total_ht      numeric(12, 2) default 0,
@@ -64,6 +64,7 @@ create policy "factures: delete own" on factures for delete  using (auth.uid() =
 
 create index if not exists idx_factures_user   on factures(user_id);
 create index if not exists idx_factures_statut on factures(statut);
+alter table factures add constraint factures_user_numero_unique unique (user_id, numero);
 
 -- ── Table: lignes_facture ────────────────────────────────────
 create table if not exists lignes_facture (

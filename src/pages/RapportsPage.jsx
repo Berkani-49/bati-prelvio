@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
-import { TrendingUp, Euro, FileText, Receipt, FileDown } from 'lucide-react'
+import { TrendingUp, Euro, FileText, Receipt, FileDown, BookOpen } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import Button from '../components/ui/Button'
 import Spinner from '../components/ui/Spinner'
-import { downloadCSV } from '../lib/csv'
+import { downloadCSV, exportJournalVentes } from '../lib/csv'
 import toast from 'react-hot-toast'
 
 const MOIS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc']
@@ -164,6 +164,7 @@ export default function RapportsPage() {
   const [chartData, setChartData] = useState([])
   const [allDevis, setAllDevis]   = useState([])
   const [allFactures, setAllFactures] = useState([])
+  const [pointages, setPointages] = useState([])
 
   useEffect(() => { loadData() }, [period])
 
@@ -173,10 +174,12 @@ export default function RapportsPage() {
     cutoff.setMonth(cutoff.getMonth() - parseInt(period))
     const since = cutoff.toISOString()
 
-    const [{ data: devis }, { data: factures }] = await Promise.all([
+    const [{ data: devis }, { data: factures }, { data: pts }] = await Promise.all([
       supabase.from('devis').select('*, clients(nom)').gte('created_at', since).order('created_at'),
       supabase.from('factures').select('*, clients(nom)').gte('created_at', since).order('created_at'),
+      supabase.from('pointages').select('*, chantiers(nom)').gte('date', since.slice(0, 10)).order('date', { ascending: false }),
     ])
+    setPointages(pts || [])
 
     const d = devis    || []
     const f = factures || []
@@ -246,7 +249,7 @@ export default function RapportsPage() {
   }
 
   return (
-    <div className="p-6 space-y-6 max-w-5xl">
+    <div className="p-4 md:p-6 space-y-6 max-w-5xl">
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
@@ -336,6 +339,103 @@ export default function RapportsPage() {
 
           {/* Top clients */}
           <TopClients devis={allDevis} factures={allFactures} />
+
+          {/* Heures par ouvrier */}
+          {pointages.length > 0 && (() => {
+            const map = {}
+            pointages.forEach(p => {
+              if (!p.heure_debut || !p.heure_fin) return
+              const [hd, md] = p.heure_debut.split(':').map(Number)
+              const [hf, mf] = p.heure_fin.split(':').map(Number)
+              const min = (hf * 60 + mf) - (hd * 60 + md) - (p.pause_min || 0)
+              if (min <= 0) return
+              const nom = p.ouvrier_nom || 'Inconnu'
+              if (!map[nom]) map[nom] = { min: 0, jours: 0 }
+              map[nom].min  += min
+              map[nom].jours += 1
+            })
+            const rows = Object.entries(map)
+              .map(([nom, v]) => ({ nom, heures: `${Math.floor(v.min / 60)}h${String(v.min % 60).padStart(2, '0')}`, jours: v.jours, min: v.min }))
+              .sort((a, b) => b.min - a.min)
+
+            return (
+              <div className="card overflow-hidden">
+                <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+                  <h2 className="text-sm font-semibold text-gray-700">Heures par ouvrier</h2>
+                  <span className="text-xs text-gray-400">{pointages.length} pointage{pointages.length > 1 ? 's' : ''}</span>
+                </div>
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-100">
+                      <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500 uppercase">Ouvrier</th>
+                      <th className="text-center px-4 py-2.5 text-xs font-semibold text-gray-500 uppercase">Jours</th>
+                      <th className="text-right px-4 py-2.5 text-xs font-semibold text-gray-500 uppercase">Heures</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {rows.map(r => (
+                      <tr key={r.nom} className="hover:bg-gray-50">
+                        <td className="px-4 py-2.5 font-medium text-gray-900">{r.nom}</td>
+                        <td className="px-4 py-2.5 text-center text-gray-500">{r.jours}</td>
+                        <td className="px-4 py-2.5 text-right font-semibold text-blue-700">{r.heures}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr className="border-t-2 border-gray-200 bg-gray-50">
+                      <td className="px-4 py-2.5 text-xs font-semibold text-gray-500">TOTAL</td>
+                      <td className="px-4 py-2.5 text-center text-xs font-semibold text-gray-700">
+                        {rows.reduce((s, r) => s + r.jours, 0)}
+                      </td>
+                      <td className="px-4 py-2.5 text-right text-xs font-semibold text-blue-700">
+                        {(() => { const t = rows.reduce((s, r) => s + r.min, 0); return `${Math.floor(t / 60)}h${String(t % 60).padStart(2, '0')}` })()}
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            )
+          })()}
+
+          {/* Export comptable */}
+          <div className="card p-5">
+            <div className="flex items-start gap-4 mb-4">
+              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-violet-600 shrink-0">
+                <BookOpen size={18} className="text-white" />
+              </div>
+              <div>
+                <h2 className="text-sm font-semibold text-gray-900">Export comptable</h2>
+                <p className="text-xs text-gray-500 mt-0.5">Fichiers compatibles Sage, EBP, ou votre expert-comptable</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                onClick={() => {
+                  exportJournalVentes(allFactures)
+                  toast.success('Journal des ventes exporté')
+                }}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
+              >
+                <FileDown size={18} className="text-violet-600 shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Journal des ventes</p>
+                  <p className="text-xs text-gray-400">Factures avec comptes PCG (411, 445, 706)</p>
+                </div>
+              </button>
+              <button
+                onClick={() => {
+                  exportConsolide()
+                }}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
+              >
+                <FileDown size={18} className="text-blue-600 shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Export consolidé</p>
+                  <p className="text-xs text-gray-400">Devis + factures sur la période sélectionnée</p>
+                </div>
+              </button>
+            </div>
+          </div>
         </>
       )}
     </div>

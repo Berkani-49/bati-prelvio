@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { ArrowLeft, Plus, Trash2, Eye } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
+import { useSubscription } from '../../hooks/useSubscription'
 import { getEntrepriseData, fetchLogoBase64 } from '../../lib/entreprise'
 import { generateFacturePDF, downloadPDF } from '../../lib/pdf'
 import Button from '../../components/ui/Button'
 import Spinner from '../../components/ui/Spinner'
+import PaywallModal from '../../components/ui/PaywallModal'
 import toast from 'react-hot-toast'
 
 const TVA = 0.20
@@ -15,19 +17,30 @@ function euro(v) {
   return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(v || 0)
 }
 
-async function generateNumeroFacture() {
-  const year  = new Date().getFullYear()
-  const month = String(new Date().getMonth() + 1).padStart(2, '0')
-  const { count } = await supabase.from('factures').select('*', { count: 'exact', head: true })
-  const seq = String((count || 0) + 1).padStart(3, '0')
-  return `FAC-${year}${month}-${seq}`
+async function pickNextNumeroFacture() {
+  const year   = new Date().getFullYear()
+  const month  = String(new Date().getMonth() + 1).padStart(2, '0')
+  const prefix = `FAC-${year}${month}-`
+  const { data } = await supabase
+    .from('factures')
+    .select('numero')
+    .like('numero', `${prefix}%`)
+    .order('numero', { ascending: false })
+    .limit(1)
+  const lastSeq = data?.[0]?.numero
+    ? parseInt(data[0].numero.replace(prefix, ''), 10)
+    : 0
+  return `${prefix}${String(lastSeq + 1).padStart(3, '0')}`
 }
 
 const EMPTY_LIGNE = () => ({ designation: '', quantite: 1, pu_ht: '' })
 
 export default function FactureNewPage() {
-  const { user }    = useAuth()
+  const { effectiveUserId } = useAuth()
   const navigate    = useNavigate()
+  const [searchParams] = useSearchParams()
+  const fromDevisId = searchParams.get('from_devis')
+  const { loading: subLoading, canCreateFacture, facturesThisMonth } = useSubscription()
 
   const [numero, setNumero]           = useState('')
   const [clients, setClients]         = useState([])
@@ -42,14 +55,31 @@ export default function FactureNewPage() {
 
   useEffect(() => {
     Promise.all([
-      generateNumeroFacture(),
+      pickNextNumeroFacture(),
       supabase.from('clients').select('id, nom, email').order('nom'),
       supabase.from('devis').select('id, numero, total_ttc, clients(id, nom)').eq('statut', 'accepte').order('created_at', { ascending: false }),
-    ]).then(([num, { data: cls }, { data: dvs }]) => {
+    ]).then(async ([num, { data: cls }, { data: dvs }]) => {
+      const allDevis = dvs || []
       setNumero(num)
       setClients(cls || [])
-      setDevisAcceptes(dvs || [])
+      setDevisAcceptes(allDevis)
       setLoading(false)
+
+      // Pré-remplir depuis un devis — on utilise allDevis directement (pas le state)
+      if (fromDevisId) {
+        setSelectedDevisId(fromDevisId)
+        const devis = allDevis.find(d => d.id === fromDevisId)
+        if (devis?.clients?.id) setSelectedClientId(devis.clients.id)
+        const { data: lignesDevis } = await supabase
+          .from('lignes_devis').select('*').eq('devis_id', fromDevisId)
+        if (lignesDevis?.length) {
+          setLignes(lignesDevis.map(l => ({
+            designation: l.designation,
+            quantite:    Number(l.quantite),
+            pu_ht:       Number(l.pu_ht),
+          })))
+        }
+      }
     })
   }, [])
 
@@ -118,24 +148,29 @@ export default function FactureNewPage() {
         total_ht:    Number((Number(l.quantite) * Number(l.pu_ht)).toFixed(2)),
       }))
 
-      const { data: facture, error: fErr } = await supabase
-        .from('factures')
-        .insert({
-          user_id:       user.id,
-          client_id:     selectedClientId,
-          devis_id:      selectedDevisId || null,
-          numero,
-          statut:        'brouillon',
-          total_ht:      Number(totalHT.toFixed(2)),
-          total_tva:     Number(totalTVA.toFixed(2)),
-          total_ttc:     Number(totalTTC.toFixed(2)),
-          date_echeance: dateEcheance || null,
-          notes:         notes || null,
-        })
-        .select()
-        .single()
-
-      if (fErr) throw fErr
+      let facture = null
+      for (let attempt = 0; attempt < 5; attempt++) {
+        const nextNumero = await pickNextNumeroFacture()
+        const { data: d, error: fErr } = await supabase
+          .from('factures')
+          .insert({
+            user_id:       effectiveUserId,
+            client_id:     selectedClientId,
+            devis_id:      selectedDevisId || null,
+            numero:        nextNumero,
+            statut:        'brouillon',
+            total_ht:      Number(totalHT.toFixed(2)),
+            total_tva:     Number(totalTVA.toFixed(2)),
+            total_ttc:     Number(totalTTC.toFixed(2)),
+            date_echeance: dateEcheance || null,
+            notes:         notes || null,
+          })
+          .select()
+          .single()
+        if (!fErr) { facture = d; setNumero(nextNumero); break }
+        if (!fErr?.message?.includes('unique') && !fErr?.message?.includes('duplicate')) throw fErr
+      }
+      if (!facture) throw new Error('Impossible de générer un numéro unique. Réessayez.')
 
       const { error: lErr } = await supabase
         .from('lignes_facture')
@@ -143,7 +178,7 @@ export default function FactureNewPage() {
 
       if (lErr) throw lErr
 
-      toast.success(`Facture ${numero} créée !`)
+      toast.success(`Facture ${facture.numero} créée !`)
       navigate('/factures')
     } catch (err) {
       toast.error(err.message || 'Erreur lors de la création')
@@ -152,10 +187,24 @@ export default function FactureNewPage() {
     }
   }
 
-  if (loading) return <div className="flex items-center justify-center h-64"><Spinner /></div>
+  if (loading || subLoading) return <div className="flex items-center justify-center h-64"><Spinner /></div>
+
+  if (!canCreateFacture) return (
+    <>
+      <div className="p-4 md:p-6 max-w-3xl">
+        <div className="flex items-center gap-3 mb-6">
+          <Link to="/factures" className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors">
+            <ArrowLeft size={18} />
+          </Link>
+          <h1 className="text-xl font-bold text-gray-900">Nouvelle facture</h1>
+        </div>
+      </div>
+      <PaywallModal type="facture" used={facturesThisMonth} onClose={() => navigate('/factures')} />
+    </>
+  )
 
   return (
-    <div className="p-6 max-w-3xl space-y-6">
+    <div className="p-4 md:p-6 max-w-3xl space-y-6">
       <div className="flex items-center gap-3">
         <Link
           to="/factures"

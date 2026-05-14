@@ -364,6 +364,62 @@
   50% { transform: translateY(-10px); }
 }
 
+/* ── METIERS BANNER ── */
+.cp-landing .metiers-banner {
+  background: white;
+  padding: 2.5rem 5%;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.cp-landing .metiers-banner-inner {
+  max-width: 860px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+}
+
+.cp-landing .metier-pill {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.2rem;
+  flex: 1;
+}
+
+.cp-landing .metier-emoji {
+  font-size: 2.2rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.cp-landing .metier-pill strong {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+.cp-landing .metier-pill p {
+  font-size: 0.88rem;
+  color: #6b7280;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.cp-landing .metier-divider {
+  width: 1px;
+  height: 60px;
+  background: #e5e7eb;
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .cp-landing .metiers-banner-inner { flex-direction: column; gap: 1.5rem; }
+  .cp-landing .metier-divider { width: 100%; height: 1px; }
+}
+
 /* ── STATS ── */
 .cp-landing .stats {
   padding: 5rem 5%;

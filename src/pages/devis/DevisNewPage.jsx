@@ -3,7 +3,10 @@ import { useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
+import { useSubscription } from '../../hooks/useSubscription'
 import DevisForm from '../../components/devis/DevisForm'
+import PaywallModal from '../../components/ui/PaywallModal'
+import Spinner from '../../components/ui/Spinner'
 import toast from 'react-hot-toast'
 
 async function pickNextNumero() {
@@ -26,35 +29,71 @@ async function pickNextNumero() {
 }
 
 export default function DevisNewPage() {
-  const { effectiveUserId } = useAuth()
-  const navigate            = useNavigate()
-  const [saving, setSaving] = useState(false)
+  const { effectiveUserId }                            = useAuth()
+  const navigate                                       = useNavigate()
+  const { loading: subLoading, canCreateDevis, devisThisMonth } = useSubscription()
+  const [saving, setSaving]   = useState(false)
   const [preview, setPreview] = useState('')
 
-  // Numéro affiché en en-tête (indicatif, peut changer au save si collision)
   useEffect(() => { pickNextNumero().then(setPreview) }, [])
+
+  if (subLoading) return (
+    <div className="flex items-center justify-center h-64"><Spinner /></div>
+  )
+
+  if (!canCreateDevis) return (
+    <>
+      <div className="p-4 md:p-6 max-w-2xl">
+        <div className="flex items-center gap-3 mb-6">
+          <Link to="/devis" className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors">
+            <ArrowLeft size={18} />
+          </Link>
+          <h1 className="text-xl font-bold text-gray-900">Nouveau devis</h1>
+        </div>
+      </div>
+      <PaywallModal used={devisThisMonth} onClose={() => navigate('/devis')} />
+    </>
+  )
 
   async function handleSave(data) {
     setSaving(true)
     try {
       const { client, lignes = [] } = data
 
-      // Upsert client
+      // Résolution client — évite les doublons
       let clientId = client.id
       if (!clientId) {
-        const { data: newClient, error: cErr } = await supabase
-          .from('clients')
-          .insert({
-            nom:     client.nom,
-            email:   client.email || null,
-            tel:     client.tel   || null,
-            adresse: client.adresse || null,
-            user_id: effectiveUserId,
-          })
-          .select()
-          .single()
-        if (cErr) throw cErr
-        clientId = newClient.id
+        // 1. Cherche par email exact
+        if (client.email) {
+          const { data: byEmail } = await supabase
+            .from('clients').select('id')
+            .eq('user_id', effectiveUserId).eq('email', client.email)
+            .maybeSingle()
+          if (byEmail) clientId = byEmail.id
+        }
+        // 2. Cherche par nom exact (évite le doublon sans email)
+        if (!clientId && client.nom) {
+          const { data: byNom } = await supabase
+            .from('clients').select('id')
+            .eq('user_id', effectiveUserId).eq('nom', client.nom)
+            .maybeSingle()
+          if (byNom) clientId = byNom.id
+        }
+        // 3. Crée le client si vraiment nouveau
+        if (!clientId) {
+          const { data: newClient, error: cErr } = await supabase
+            .from('clients')
+            .insert({
+              nom:     client.nom,
+              email:   client.email   || null,
+              tel:     client.tel     || null,
+              adresse: client.adresse || null,
+              user_id: effectiveUserId,
+            })
+            .select().single()
+          if (cErr) throw cErr
+          clientId = newClient.id
+        }
       }
 
       // Totaux
@@ -111,7 +150,7 @@ export default function DevisNewPage() {
   }
 
   return (
-    <div className="p-6 max-w-2xl space-y-6">
+    <div className="p-4 md:p-6 max-w-2xl space-y-6">
       <div className="flex items-center gap-3">
         <Link
           to="/devis"

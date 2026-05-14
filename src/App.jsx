@@ -32,6 +32,8 @@ import NotFoundPage from './pages/NotFoundPage'
 import MentionsLegalesPage from './pages/legal/MentionsLegalesPage'
 import ConfidentialitePage from './pages/legal/ConfidentialitePage'
 import CGUPage from './pages/legal/CGUPage'
+import PortailClientPage from './pages/portail/PortailClientPage'
+import TresoreriePage from './pages/tresorerie/TresoreriePage'
 import Spinner from './components/ui/Spinner'
 
 function ProtectedRoute({ children }) {
@@ -74,6 +76,7 @@ function AppRoutes() {
         <Route path="/cgu"               element={<CGUPage />} />
         <Route path="/signer/:token"     element={<SignerPage />} />
         <Route path="/join/:token"        element={<JoinPage />} />
+        <Route path="/portail/:token"    element={<PortailClientPage />} />
       <Route path="/reset-password"    element={<ResetPasswordPage />} />
 
         {/* Protected app routes */}
@@ -103,6 +106,7 @@ function AppRoutes() {
           <Route path="/factures/nouvelle"      element={<FactureNewPage />} />
           <Route path="/factures/:id/edit"      element={<FactureEditPage />} />
           <Route path="/rapports"               element={<RapportsPage />} />
+          <Route path="/tresorerie"             element={<TresoreriePage />} />
           <Route path="/avoirs"                 element={<AvoirListPage />} />
           <Route path="/parametres"             element={<ParametresPage />} />
         </Route>
