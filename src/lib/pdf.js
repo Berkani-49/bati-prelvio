@@ -224,7 +224,7 @@ export function generateDevisPDF({ devis, client, lignes, entreprise, logoBase64
     doc.text(`Signé le ${sigDate}${devis.signe_par ? ` par ${devis.signe_par}` : ''}`, margin, sigY + 35)
   }
 
-  drawFooter(doc, pageW, finalY + 54,
+  drawFooter(doc, pageW, finalY + 70,
     'Devis valable 30 jours — TVA non applicable si micro-entreprise (art. 293B du CGI)')
 
   return doc
@@ -312,7 +312,7 @@ export function generateFacturePDF({ facture, client, lignes, entreprise, logoBa
 
   drawTotals(doc, pageW, margin, finalY, totalHT, totalTVA, totalTTC)
 
-  drawFooter(doc, pageW, finalY + 54,
+  drawFooter(doc, pageW, finalY + 70,
     'Paiement à réception de facture — TVA non applicable si micro-entreprise (art. 293B du CGI)')
 
   return doc
