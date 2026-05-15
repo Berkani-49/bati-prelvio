@@ -7,7 +7,7 @@ export default function LandingPage() {
   const { user, loading } = useAuth()
 
   useEffect(() => {
-    document.title = 'Bati Prelvio — Logiciel de gestion pour plombiers et électriciens'
+    document.title = 'Bati Prelvio — Logiciel de gestion pour artisans du BTP'
     return () => { document.title = 'Bati Prelvio' }
   }, [])
 
@@ -23,18 +23,14 @@ export default function LandingPage() {
       },
       { threshold: 0.1, rootMargin: '0px 0px -80px 0px' }
     )
-
     document
-      .querySelectorAll(
-        '.cp-landing .feature-card, .cp-landing .stat-item, .cp-landing .step, .cp-landing .pricing-card'
-      )
+      .querySelectorAll('.cp-landing .feature-card, .cp-landing .stat-item, .cp-landing .step, .cp-landing .pricing-card')
       .forEach((el) => {
         el.style.opacity = '0'
         el.style.transform = 'translateY(24px)'
         el.style.transition = 'opacity 0.55s ease-out, transform 0.55s ease-out'
         observer.observe(el)
       })
-
     return () => observer.disconnect()
   }, [])
 
@@ -43,10 +39,16 @@ export default function LandingPage() {
 
   return (
     <div className="cp-landing">
+
       {/* NAV */}
       <nav>
         <Link to="/" className="lp-logo">
-          <div className="lp-logo-icon">🏗️</div>
+          <div className="lp-logo-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+          </div>
           <span>Bati Prelvio</span>
         </Link>
         <ul className="nav-links">
@@ -64,90 +66,144 @@ export default function LandingPage() {
       <section className="hero" id="accueil">
         <div className="hero-content">
           <div className="hero-text">
-            <div className="lp-badge">🔧 Conçu pour les plombiers et électriciens</div>
+            <div className="lp-badge">
+              <span className="badge-dot" />
+              Nouveau : Planning d'équipe &amp; pointage terrain
+            </div>
             <h1>
-              Fini la paperasse,<br />place aux <span className="gradient-text">chantiers</span>
+              Pilotez vos chantiers,<br />
+              <span className="orange-text">boostez votre</span><br />
+              <span className="orange-text">rentabilité</span> sans effort.
             </h1>
             <p>
-              Bati Prelvio est le logiciel de gestion pensé pour les artisans plombiers et électriciens.
-              Devis professionnels en 2 minutes, suivi de chantier, facturation — tout en un, sans complication.
+              Devis, factures, chantiers, trésorerie — tout au même endroit.
+              L'outil conçu par et pour les artisans du bâtiment, qui vous fait gagner 2h par jour.
             </p>
             <div className="hero-buttons">
-              <Link to="/login" className="lp-cta-btn">Commencer gratuitement</Link>
-              <a href="#fonctionnalites" className="lp-secondary-btn">Voir les fonctionnalités</a>
+              <Link to="/login" className="lp-cta-btn hero-cta">
+                Démarrer mon essai gratuit <span className="btn-arrow">→</span>
+              </Link>
+              <a href="#comment" className="lp-secondary-btn">
+                <span className="play-icon">▶</span> Voir comment ça marche
+              </a>
             </div>
             <div className="trust-row">
-              <span>Sans carte bancaire</span>
-              <span>Gratuit 30 jours</span>
-              <span>PDF professionnel inclus</span>
-              <span>Catalogue plomberie / électricité</span>
+              <span>Gratuit pour démarrer — sans carte bancaire</span>
+              <span>Conforme facturation 2026</span>
+              <span>Données hébergées en France</span>
             </div>
           </div>
 
           <div className="hero-visual">
-            <div style={{ position: 'relative' }}>
+            <div className="mockup-wrapper">
+
+              {/* Floating revenue card (top right) */}
+              <div className="mockup-float-revenue">
+                <div className="float-revenue-icon">€</div>
+                <div>
+                  <div className="float-revenue-value">+12 340 €</div>
+                  <div className="float-revenue-trend">+23% ce mois</div>
+                </div>
+              </div>
+
+              {/* Main app mockup */}
               <div className="dashboard-mockup">
                 <div className="mockup-topbar">
                   <div className="dot dot-red" />
                   <div className="dot dot-yellow" />
                   <div className="dot dot-green" />
-                  <span className="mockup-topbar-title">batiprelvio.vercel.app/dashboard</span>
+                  <span className="mockup-topbar-title">app.batiprelvio.com/dashboard</span>
                 </div>
-                <div className="mockup-body">
-                  <div className="mockup-header">
-                    <h4>Tableau de bord</h4>
-                    <span className="month-badge">Mai 2026</span>
-                  </div>
-                  <div className="mockup-stats">
-                    <div className="mockup-stat">
-                      <div className="mockup-stat-label">CA ce mois</div>
-                      <div className="mockup-stat-value blue">14 850 €</div>
+                <div className="mockup-app">
+                  {/* Sidebar */}
+                  <div className="mockup-sidebar">
+                    <div className="mockup-sidebar-logo">BP</div>
+                    <div className="mockup-sidebar-label">GESTION</div>
+                    <div className="mockup-nav-item active">
+                      <span>⊞</span> Accueil
                     </div>
-                    <div className="mockup-stat">
-                      <div className="mockup-stat-label">En attente</div>
-                      <div className="mockup-stat-value">4 devis</div>
+                    <div className="mockup-nav-item">
+                      <span>◧</span> Devis &amp; Factures
                     </div>
-                    <div className="mockup-stat">
-                      <div className="mockup-stat-label">Acceptés</div>
-                      <div className="mockup-stat-value green">5</div>
+                    <div className="mockup-nav-item new-badge-item">
+                      <span>✦</span> Devis IA
+                      <span className="nav-new">NEW</span>
+                    </div>
+                    <div className="mockup-nav-item">
+                      <span>⬡</span> Chantiers
+                    </div>
+                    <div className="mockup-nav-item">
+                      <span>◉</span> Clients
+                    </div>
+                    <div className="mockup-sidebar-label">ORGANISATION</div>
+                    <div className="mockup-nav-item">
+                      <span>▦</span> Planning
+                    </div>
+                    <div className="mockup-nav-item">
+                      <span>⏱</span> Pointage
+                    </div>
+                    <div className="mockup-nav-item">
+                      <span>◈</span> Trésorerie
                     </div>
                   </div>
-                  <div className="mockup-table-header">
-                    <span>N°</span>
-                    <span>Client</span>
-                    <span>Montant</span>
-                    <span>Statut</span>
-                  </div>
-                  <div className="mockup-row">
-                    <span>DEV-031</span>
-                    <span>M. Bernard</span>
-                    <span>1 680 €</span>
-                    <span><span className="status-badge accepted">Accepté</span></span>
-                  </div>
-                  <div className="mockup-row">
-                    <span>DEV-030</span>
-                    <span>Mme Fontaine</span>
-                    <span>850 €</span>
-                    <span><span className="status-badge sent">Envoyé</span></span>
-                  </div>
-                  <div className="mockup-row">
-                    <span>DEV-029</span>
-                    <span>Résid. Les Pins</span>
-                    <span>4 200 €</span>
-                    <span><span className="status-badge accepted">Accepté</span></span>
-                  </div>
-                  <div className="mockup-row">
-                    <span>DEV-028</span>
-                    <span>M. Lacroix</span>
-                    <span>560 €</span>
-                    <span><span className="status-badge draft">Brouillon</span></span>
+
+                  {/* Main content */}
+                  <div className="mockup-main">
+                    <div className="mockup-main-header">
+                      <h4>Tableau de bord</h4>
+                      <span className="month-badge">Mai 2026</span>
+                    </div>
+                    <div className="mockup-stats">
+                      <div className="mockup-stat">
+                        <div className="mockup-stat-label">CA ce mois</div>
+                        <div className="mockup-stat-value orange-val">14 850 €</div>
+                      </div>
+                      <div className="mockup-stat">
+                        <div className="mockup-stat-label">En attente</div>
+                        <div className="mockup-stat-value">4 devis</div>
+                      </div>
+                      <div className="mockup-stat">
+                        <div className="mockup-stat-label">Acceptés</div>
+                        <div className="mockup-stat-value green-val">5</div>
+                      </div>
+                    </div>
+                    <div className="mockup-table-header">
+                      <span>N°</span>
+                      <span>Client</span>
+                      <span>Montant</span>
+                      <span>Statut</span>
+                    </div>
+                    <div className="mockup-row">
+                      <span>DEV-031</span>
+                      <span>M. Bernard</span>
+                      <span>1 680 €</span>
+                      <span><span className="status-badge accepted">Accepté</span></span>
+                    </div>
+                    <div className="mockup-row">
+                      <span>DEV-030</span>
+                      <span>Mme Fontaine</span>
+                      <span>850 €</span>
+                      <span><span className="status-badge sent">Envoyé</span></span>
+                    </div>
+                    <div className="mockup-row">
+                      <span>DEV-029</span>
+                      <span>Résid. Les Pins</span>
+                      <span>4 200 €</span>
+                      <span><span className="status-badge accepted">Accepté</span></span>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div className="mockup-floating">
-                <div className="mockup-floating-label">Devis accepté ✓</div>
-                <div className="mockup-floating-value">+1 680 €</div>
+
+              {/* Floating notification (bottom left) */}
+              <div className="mockup-float-notif">
+                <div className="notif-check">✓</div>
+                <div>
+                  <div className="notif-title">Devis #031 accepté</div>
+                  <div className="notif-time">il y a 2 min</div>
+                </div>
               </div>
+
             </div>
           </div>
         </div>
@@ -161,16 +217,16 @@ export default function LandingPage() {
             <div className="stat-label">Pour créer un devis complet</div>
           </div>
           <div className="stat-item">
-            <div className="stat-number">100%</div>
-            <div className="stat-label">Données sécurisées (Supabase)</div>
+            <div className="stat-number">10</div>
+            <div className="stat-label">Modules métier inclus</div>
           </div>
           <div className="stat-item">
             <div className="stat-number">0 €</div>
             <div className="stat-label">Pour démarrer</div>
           </div>
           <div className="stat-item">
-            <div className="stat-number">PDF</div>
-            <div className="stat-label">Généré & envoyé automatiquement</div>
+            <div className="stat-number">2h</div>
+            <div className="stat-label">Gagnées par jour en moyenne</div>
           </div>
         </div>
       </section>
@@ -182,7 +238,7 @@ export default function LandingPage() {
             <span className="metier-emoji">🔧</span>
             <div>
               <strong>Plombiers</strong>
-              <p>Remplacement chauffe-eau, débouchage, installation sanitaires — votre catalogue en 1 clic.</p>
+              <p>Chauffe-eau, débouchage, sanitaires — votre catalogue prêt en 1 clic.</p>
             </div>
           </div>
           <div className="metier-divider" />
@@ -190,7 +246,15 @@ export default function LandingPage() {
             <span className="metier-emoji">⚡</span>
             <div>
               <strong>Électriciens</strong>
-              <p>Tableau électrique, bornes de recharge, VMC, mise en conformité — devis prêts en 2 min.</p>
+              <p>Tableau électrique, bornes, VMC, mise en conformité — devis en 2 min.</p>
+            </div>
+          </div>
+          <div className="metier-divider" />
+          <div className="metier-pill">
+            <span className="metier-emoji">🧱</span>
+            <div>
+              <strong>Maçons &amp; Carreleurs</strong>
+              <p>Chantiers de rénovation, suivi d'avancement, planning équipe.</p>
             </div>
           </div>
         </div>
@@ -199,8 +263,8 @@ export default function LandingPage() {
       {/* FEATURES */}
       <section className="features" id="fonctionnalites">
         <div className="section-header">
-          <h2>Tout ce dont vous avez <span className="gradient-text">besoin</span></h2>
-          <p>Des outils pensés pour les artisans plombiers et électriciens, pas pour les comptables.</p>
+          <h2>Tout ce dont vous avez <span className="orange-text">besoin</span></h2>
+          <p>Des outils pensés pour les artisans du BTP, pas pour les comptables.</p>
         </div>
         <div className="features-grid">
           <div className="feature-card">
@@ -221,17 +285,32 @@ export default function LandingPage() {
           <div className="feature-card">
             <div className="feature-icon">🏗️</div>
             <h3>Suivi des chantiers</h3>
-            <p>Gérez chaque intervention : dates, avancement, tâches, journal de chantier. Tout au même endroit.</p>
+            <p>Gérez chaque intervention : dates, avancement, tâches, journal, photos. Tout au même endroit.</p>
           </div>
           <div className="feature-card">
             <div className="feature-icon">💰</div>
             <h3>Facturation en 1 clic</h3>
-            <p>Transformez un devis accepté en facture instantanément. Suivez les paiements et relancez les impayés.</p>
+            <p>Transformez un devis accepté en facture instantanément. Suivez les paiements et relancez les impayés automatiquement.</p>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">📅</div>
+            <h3>Planning équipe + pointage</h3>
+            <p>Organisez vos équipes sur desktop et mobile. Exportez les heures en CSV pour la paie.</p>
           </div>
           <div className="feature-card">
             <div className="feature-icon">📊</div>
-            <h3>Tableau de bord</h3>
-            <p>CA mensuel, devis en attente, chantiers en cours, alertes véhicules — tout votre business en un coup d'œil.</p>
+            <h3>Trésorerie &amp; prévisions</h3>
+            <p>CA mensuel, prévisions cumulatives, export Sage/EBP — pilotez votre business en temps réel.</p>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">🔗</div>
+            <h3>Portail client sécurisé</h3>
+            <p>Vos clients consultent devis et factures via un lien unique. Sans compte, sans friction.</p>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">🚗</div>
+            <h3>Véhicules &amp; matériel</h3>
+            <p>Suivez votre parc, planifiez les révisions, attribuez véhicules et matériel par chantier.</p>
           </div>
         </div>
       </section>
@@ -239,24 +318,24 @@ export default function LandingPage() {
       {/* HOW IT WORKS */}
       <section className="how-it-works" id="comment">
         <div className="section-header">
-          <h2>Comment ça <span className="gradient-text">marche</span> ?</h2>
-          <p>Opérationnel en moins de 5 minutes, sans formation, sans installation.</p>
+          <h2>Opérationnel en <span className="orange-text">5 minutes</span></h2>
+          <p>Sans formation, sans installation, sans carte bancaire.</p>
         </div>
         <div className="steps-grid">
           <div className="step">
             <div className="step-number">1</div>
             <h3>Créez votre compte</h3>
-            <p>Inscription gratuite en 30 secondes. Choisissez votre métier (plombier ou électricien) pour activer le bon catalogue de prestations.</p>
+            <p>Inscription gratuite en 30 secondes. Choisissez votre métier pour activer le bon catalogue de prestations.</p>
           </div>
           <div className="step">
             <div className="step-number">2</div>
-            <h3>Choisissez dans votre catalogue</h3>
-            <p>Lors du devis, cliquez sur "Catalogue métier" et sélectionnez vos prestations pré-remplies. Ajustez les quantités et les prix.</p>
+            <h3>Créez votre premier devis</h3>
+            <p>Cliquez sur "Catalogue métier", sélectionnez vos prestations pré-remplies. Ajustez quantités et prix en quelques secondes.</p>
           </div>
           <div className="step">
             <div className="step-number">3</div>
             <h3>Envoyez le PDF par email</h3>
-            <p>Prévisualisez le PDF professionnel, puis envoyez-le en un clic. Votre client reçoit un email soigné avec le devis en pièce jointe.</p>
+            <p>Prévisualisez le PDF professionnel avec votre logo, puis envoyez-le en un clic directement à votre client.</p>
           </div>
         </div>
       </section>
@@ -264,22 +343,22 @@ export default function LandingPage() {
       {/* PRICING */}
       <section className="pricing" id="tarifs">
         <div className="section-header">
-          <h2>Des tarifs <span className="gradient-text">simples</span></h2>
+          <h2>Des tarifs <span className="orange-text">transparents</span></h2>
           <p>Commencez gratuitement, passez Pro quand vous en avez besoin.</p>
         </div>
         <div className="pricing-cards">
           <div className="pricing-card">
             <div className="pricing-name">Gratuit</div>
             <div className="pricing-price">0 € <span>/ mois</span></div>
-            <div className="pricing-description">Pour tester et démarrer.</div>
+            <div className="pricing-description">Pour tester sans risque.</div>
             <ul className="pricing-features">
               <li>5 devis par mois</li>
               <li>Génération PDF</li>
               <li>Envoi email</li>
               <li>Tableau de bord</li>
-              <li className="muted">Chantiers illimités</li>
-              <li className="muted">Facturation</li>
+              <li className="muted">Chantiers &amp; facturation</li>
               <li className="muted">Logo entreprise sur PDF</li>
+              <li className="muted">Planning &amp; pointage</li>
             </ul>
             <Link to="/login" className="pricing-cta secondary">Commencer gratuitement</Link>
           </div>
@@ -290,42 +369,51 @@ export default function LandingPage() {
             <div className="pricing-price">29 € <span>/ mois</span></div>
             <div className="pricing-description">Pour les artisans actifs. Tout inclus.</div>
             <ul className="pricing-features">
-              <li>Devis illimités</li>
-              <li>Génération PDF personnalisé</li>
+              <li>Devis &amp; factures illimités</li>
+              <li>PDF personnalisé avec logo</li>
               <li>Envoi email automatique</li>
-              <li>Tableau de bord avancé</li>
-              <li>Gestion des chantiers</li>
-              <li>Facturation complète</li>
-              <li>Logo entreprise sur PDF</li>
+              <li>Gestion des chantiers complète</li>
+              <li>Planning équipe + pointage terrain</li>
+              <li>Trésorerie &amp; prévisions</li>
+              <li>Portail client sécurisé</li>
+              <li>Export Sage / EBP</li>
             </ul>
             <Link to="/checkout" className="pricing-cta primary">Essayer 30 jours gratuit</Link>
           </div>
         </div>
+        <p className="pricing-note">Moins d'une heure de travail facturé. Récupéré dès le 1er devis envoyé.</p>
       </section>
 
       {/* CTA FINAL */}
       <section className="cta-section">
-        <h2>Prêt à passer à la vitesse supérieure ?</h2>
+        <h2>Prêt à gagner 2h par jour ?</h2>
         <p>
-          Rejoignez les plombiers et électriciens qui gèrent leurs devis, chantiers et factures avec Bati Prelvio.
+          Rejoignez les artisans qui pilotent leurs devis, chantiers et factures depuis un seul outil.
           Démarrez gratuitement, sans carte bancaire.
         </p>
-        <Link to="/login" className="lp-cta-btn">Créer mon compte gratuit</Link>
+        <Link to="/login" className="lp-cta-btn cta-hero-btn">
+          Créer mon compte gratuit →
+        </Link>
         <p className="cta-note">Essai 30 jours — Sans engagement — Sans carte bancaire</p>
       </section>
 
       {/* FOOTER */}
       <footer>
         <div className="footer-logo">
-          <div className="footer-logo-icon">🔧</div>
+          <div className="footer-logo-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+          </div>
           <span>Bati Prelvio</span>
         </div>
-        <p>© 2026 Bati Prelvio — Logiciel de gestion pour plombiers et électriciens. Tous droits réservés.</p>
-        <div style={{ display: 'flex', gap: '24px', justifyContent: 'center', marginTop: '12px', flexWrap: 'wrap' }}>
-          <Link to="/mentions-legales" style={{ color: '#94a3b8', fontSize: '13px', textDecoration: 'none' }}>Mentions légales</Link>
-          <Link to="/confidentialite" style={{ color: '#94a3b8', fontSize: '13px', textDecoration: 'none' }}>Politique de confidentialité</Link>
-          <Link to="/cgu" style={{ color: '#94a3b8', fontSize: '13px', textDecoration: 'none' }}>CGU</Link>
-          <a href="mailto:info@prelvio.com" style={{ color: '#94a3b8', fontSize: '13px', textDecoration: 'none' }}>Contact</a>
+        <p>© 2026 Bati Prelvio — Logiciel de gestion pour artisans du BTP. Tous droits réservés.</p>
+        <div className="footer-links">
+          <Link to="/mentions-legales">Mentions légales</Link>
+          <Link to="/confidentialite">Politique de confidentialité</Link>
+          <Link to="/cgu">CGU</Link>
+          <a href="mailto:info@prelvio.com">Contact</a>
         </div>
       </footer>
     </div>
