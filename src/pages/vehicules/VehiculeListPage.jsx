@@ -16,7 +16,7 @@ const TYPES = {
 
 const STATUT_STYLES = {
   disponible:   'bg-green-100 text-green-700',
-  en_service:   'bg-blue-100 text-blue-700',
+  en_service:   'bg-orange-100 text-orange-700',
   maintenance:  'bg-amber-100 text-amber-700',
   hors_service: 'bg-red-100 text-red-700',
 }

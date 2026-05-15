@@ -23,7 +23,7 @@ export default function MentionsLegalesPage() {
               <li><strong>Numéro d'entreprise BCE :</strong> [1035.819.745]</li>
               <li><strong>Numéro de TVA :</strong> BE1035.819.745</li>
               <li><strong>Adresse :</strong> Charleroi, Belgique</li>
-              <li><strong>Email :</strong> <a href="mailto:info@prelvio.com" className="text-blue-600">info@prelvio.com</a></li>
+              <li><strong>Email :</strong> <a href="mailto:info@prelvio.com" className="text-orange-600">info@prelvio.com</a></li>
             </ul>
           </section>
 
@@ -38,12 +38,12 @@ export default function MentionsLegalesPage() {
             <ul className="mt-2 space-y-2 list-none pl-0">
               <li>
                 <strong>Vercel Inc.</strong> — 340 Pine Street, Suite 701, San Francisco, CA 94104, États-Unis
-                (<a href="https://vercel.com" target="_blank" rel="noopener noreferrer" className="text-blue-600">vercel.com</a>)
+                (<a href="https://vercel.com" target="_blank" rel="noopener noreferrer" className="text-orange-600">vercel.com</a>)
                 — hébergement front-end
               </li>
               <li>
                 <strong>Supabase Inc.</strong> — 970 Toa Payoh North #07-04, Singapour
-                (<a href="https://supabase.com" target="_blank" rel="noopener noreferrer" className="text-blue-600">supabase.com</a>)
+                (<a href="https://supabase.com" target="_blank" rel="noopener noreferrer" className="text-orange-600">supabase.com</a>)
                 — base de données et authentification (données hébergées dans l'UE)
               </li>
             </ul>
@@ -72,7 +72,7 @@ export default function MentionsLegalesPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-3">6. Contact</h2>
             <p>
               Pour toute question relative au présent site :{' '}
-              <a href="mailto:info@prelvio.com" className="text-blue-600">info@prelvio.com</a>
+              <a href="mailto:info@prelvio.com" className="text-orange-600">info@prelvio.com</a>
             </p>
           </section>
 

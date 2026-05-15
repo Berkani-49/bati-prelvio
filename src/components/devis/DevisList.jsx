@@ -333,7 +333,7 @@ export default function DevisList() {
             <>
               <button
                 onClick={() => { navigate(`/chantiers/nouveau?from_devis=${openDevis.id}`); setMenuOpen(null) }}
-                className="w-full text-left px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 flex items-center gap-2"
+                className="w-full text-left px-3 py-2 text-sm text-orange-600 hover:bg-orange-50 flex items-center gap-2"
               >
                 <HardHat size={14} /> Créer un chantier
               </button>

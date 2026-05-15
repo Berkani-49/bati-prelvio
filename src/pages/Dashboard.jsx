@@ -116,7 +116,7 @@ function buildAlertes({ devis, factures, vehicules, chantiers }) {
 const ALERTE_STYLES = {
   danger:  { bar: 'bg-red-500',    bg: 'bg-red-50 border-red-200',    icon: 'text-red-500',    text: 'text-red-800'  },
   warning: { bar: 'bg-amber-500',  bg: 'bg-amber-50 border-amber-200', icon: 'text-amber-500', text: 'text-amber-800'},
-  info:    { bar: 'bg-blue-500',   bg: 'bg-blue-50 border-blue-200',   icon: 'text-blue-500',  text: 'text-blue-800' },
+  info:    { bar: 'bg-orange-500',   bg: 'bg-orange-50 border-orange-200',   icon: 'text-orange-500',  text: 'text-orange-800' },
 }
 
 export default function Dashboard() {
@@ -217,7 +217,7 @@ export default function Dashboard() {
           <StatCard icon={FileText}    label="Total devis"      value={stats.devisTotal}           color="bg-slate-600" />
           <StatCard icon={TrendingUp}  label="CA accepté"       value={euro(stats.caDevisAccepte)} color="bg-primary-600" sub="Devis acceptés" />
           <StatCard icon={Clock}       label="En attente"       value={stats.devisEnCours}         color="bg-amber-500"   sub="Envoyés non traités" />
-          <StatCard icon={CheckCircle} label="Chantiers actifs" value={stats.chantiersEnCours}     color="bg-blue-500"    sub="En cours" />
+          <StatCard icon={CheckCircle} label="Chantiers actifs" value={stats.chantiersEnCours}     color="bg-orange-500"    sub="En cours" />
         </div>
       </div>
 
@@ -237,7 +237,7 @@ export default function Dashboard() {
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2.5">Terrain</p>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <StatCard icon={Truck}         label="Véhicules"          value={stats.vehiculesTotal}       color="bg-slate-600" />
-          <StatCard icon={Truck}         label="En service"         value={stats.vehiculesEnService}   color="bg-blue-500"  sub="Actuellement déployés" />
+          <StatCard icon={Truck}         label="En service"         value={stats.vehiculesEnService}   color="bg-orange-500"  sub="Actuellement déployés" />
           <StatCard icon={AlertTriangle} label="Alertes maintenance" value={stats.vehiculesAlertes}    color={stats.vehiculesAlertes > 0 ? 'bg-amber-500' : 'bg-gray-400'} sub="Échéances dans 30j" />
           <Link to="/planning" className="card p-4 md:p-5 flex items-start gap-3 md:gap-4 hover:shadow-md transition-shadow group">
             <div className="flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-xl bg-teal-500 shrink-0">

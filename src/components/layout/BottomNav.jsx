@@ -18,7 +18,7 @@ export default function BottomNav({ onMenuOpen }) {
             to={to}
             className={({ isActive }) =>
               `flex-1 flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors ${
-                isActive ? 'text-blue-600' : 'text-gray-500'
+                isActive ? 'text-orange-600' : 'text-gray-500'
               }`
             }
           >

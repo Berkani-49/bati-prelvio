@@ -22,7 +22,7 @@ function startOfDay(date) {
 const BUCKETS = [
   { label: 'En retard',   days: null,    color: 'bg-red-500',    light: 'bg-red-50 border-red-200 text-red-700' },
   { label: '0–7 j',       days: 7,       color: 'bg-amber-500',  light: 'bg-amber-50 border-amber-200 text-amber-700' },
-  { label: '8–30 j',      days: 30,      color: 'bg-blue-500',   light: 'bg-blue-50 border-blue-200 text-blue-700' },
+  { label: '8–30 j',      days: 30,      color: 'bg-orange-500',   light: 'bg-orange-50 border-orange-200 text-orange-700' },
   { label: '31–60 j',     days: 60,      color: 'bg-violet-500', light: 'bg-violet-50 border-violet-200 text-violet-700' },
   { label: '60+ j',       days: 9999,    color: 'bg-gray-400',   light: 'bg-gray-50 border-gray-200 text-gray-600' },
 ]
@@ -120,7 +120,7 @@ export default function TresoreriePage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div className="card p-4">
           <div className="flex items-center gap-2 mb-1">
-            <Euro size={14} className="text-blue-600" />
+            <Euro size={14} className="text-orange-600" />
             <p className="text-xs font-medium text-gray-500">À encaisser</p>
           </div>
           <p className="text-xl font-bold text-gray-900">{euro(totalAttente)}</p>
@@ -147,7 +147,7 @@ export default function TresoreriePage() {
             <TrendingUp size={14} className="text-green-600" />
             <p className="text-xs font-medium text-gray-500">8–30 jours</p>
           </div>
-          <p className="text-xl font-bold text-blue-600">{euro(byBucket[2].total)}</p>
+          <p className="text-xl font-bold text-orange-600">{euro(byBucket[2].total)}</p>
           <p className="text-xs text-gray-400 mt-0.5">{byBucket[2].items.length} facture{byBucket[2].items.length > 1 ? 's' : ''}</p>
         </div>
       </div>
@@ -163,13 +163,13 @@ export default function TresoreriePage() {
                   {/* Barre hebdo */}
                   {w.total > 0 && (
                     <div
-                      className="absolute bottom-0 w-full bg-blue-200 rounded-t-sm transition-all"
+                      className="absolute bottom-0 w-full bg-orange-200 rounded-t-sm transition-all"
                       style={{ height: `${(w.total / maxCumul) * 120}px` }}
                     />
                   )}
                   {/* Ligne cumul */}
                   <div
-                    className="absolute bottom-0 w-2 h-2 rounded-full bg-blue-600 z-10 -mb-1"
+                    className="absolute bottom-0 w-2 h-2 rounded-full bg-orange-600 z-10 -mb-1"
                     style={{ bottom: `${(w.cumul / maxCumul) * 120}px` }}
                   />
                   {/* Tooltip */}
@@ -185,8 +185,8 @@ export default function TresoreriePage() {
             ))}
           </div>
           <div className="flex items-center gap-4 mt-3 text-xs text-gray-500">
-            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-blue-200 inline-block" />Semaine</span>
-            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block" />Cumulé</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-orange-200 inline-block" />Semaine</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-orange-600 inline-block" />Cumulé</span>
           </div>
         </div>
       )}

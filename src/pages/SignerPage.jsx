@@ -127,7 +127,7 @@ export default function SignerPage() {
 
   if (loading) return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <Loader size={28} className="animate-spin text-blue-600" />
+      <Loader size={28} className="animate-spin text-orange-600" />
     </div>
   )
 
@@ -166,10 +166,10 @@ export default function SignerPage() {
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-2xl mx-auto space-y-5">
         {/* Header */}
-        <div className="bg-blue-600 rounded-2xl p-6 text-white">
-          <p className="text-blue-200 text-sm font-medium">Bati Prelvio</p>
+        <div className="bg-orange-600 rounded-2xl p-6 text-white">
+          <p className="text-orange-200 text-sm font-medium">Bati Prelvio</p>
           <h1 className="text-2xl font-bold mt-1">Devis N° {devis.numero}</h1>
-          <p className="text-blue-100 text-sm mt-1">
+          <p className="text-orange-100 text-sm mt-1">
             Du {new Date(devis.created_at).toLocaleDateString('fr-FR')}
           </p>
         </div>
@@ -203,14 +203,14 @@ export default function SignerPage() {
             </table>
           )}
 
-          <div className="px-5 py-4 bg-blue-50 border-t border-blue-100">
+          <div className="px-5 py-4 bg-orange-50 border-t border-orange-100">
             <div className="flex justify-between text-sm text-gray-600 mb-1">
               <span>Total HT</span><span>{euro(devis.total_ht)}</span>
             </div>
             <div className="flex justify-between text-sm text-gray-600 mb-2">
               <span>TVA 20%</span><span>{euro(devis.total_tva)}</span>
             </div>
-            <div className="flex justify-between text-base font-bold text-blue-700">
+            <div className="flex justify-between text-base font-bold text-orange-700">
               <span>Total TTC</span><span>{euro(devis.total_ttc)}</span>
             </div>
           </div>
@@ -219,7 +219,7 @@ export default function SignerPage() {
         {/* Zone de signature */}
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 space-y-4">
           <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-            <PenTool size={16} className="text-blue-600" />
+            <PenTool size={16} className="text-orange-600" />
             Votre signature
           </h2>
 
@@ -230,7 +230,7 @@ export default function SignerPage() {
               value={signerName}
               onChange={e => setSignerName(e.target.value)}
               placeholder="Prénom NOM"
-              className="w-full h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
             />
           </div>
 
@@ -261,7 +261,7 @@ export default function SignerPage() {
           <button
             onClick={handleSign}
             disabled={signing || !hasDrawn || !signerName.trim()}
-            className="w-full py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+            className="w-full py-3 bg-orange-600 text-white font-semibold rounded-xl hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
           >
             {signing ? <Loader size={16} className="animate-spin" /> : <CheckCircle size={16} />}
             {signing ? 'Enregistrement…' : 'Valider et signer le devis'}

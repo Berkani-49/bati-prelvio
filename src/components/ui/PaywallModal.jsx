@@ -22,12 +22,12 @@ export default function PaywallModal({ used, limit, type = 'devis', onClose }) {
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
 
         {/* Header */}
-        <div className="bg-gradient-to-br from-slate-800 to-blue-700 px-8 py-7 text-white text-center">
+        <div className="bg-gradient-to-br from-slate-800 to-orange-700 px-8 py-7 text-white text-center">
           <div className="flex items-center justify-center w-14 h-14 bg-white/15 rounded-2xl mx-auto mb-4">
             <Lock size={26} className="text-white" />
           </div>
           <h2 className="text-xl font-bold mb-1">Limite gratuite atteinte</h2>
-          <p className="text-blue-200 text-sm leading-relaxed">
+          <p className="text-orange-200 text-sm leading-relaxed">
             Vous avez utilisé {used} {labelPlural} sur {resolvedLimit} ce mois-ci.<br />
             Passez en Pro pour continuer sans limite.
           </p>
@@ -50,8 +50,8 @@ export default function PaywallModal({ used, limit, type = 'devis', onClose }) {
           <ul className="space-y-2.5">
             {PRO_FEATURES.map(({ icon: Icon, text }) => (
               <li key={text} className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-6 h-6 bg-blue-50 rounded-md shrink-0">
-                  <Icon size={13} className="text-blue-600" />
+                <div className="flex items-center justify-center w-6 h-6 bg-orange-50 rounded-md shrink-0">
+                  <Icon size={13} className="text-orange-600" />
                 </div>
                 <span className="text-sm text-gray-700">{text}</span>
                 <Check size={13} className="text-green-500 ml-auto shrink-0" />
@@ -68,7 +68,7 @@ export default function PaywallModal({ used, limit, type = 'devis', onClose }) {
           </div>
           <button
             onClick={() => navigate('/checkout')}
-            className="w-full flex items-center justify-center gap-2 py-3 px-6 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-600/25 hover:shadow-blue-600/40"
+            className="w-full flex items-center justify-center gap-2 py-3 px-6 bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white font-semibold rounded-xl transition-all shadow-lg shadow-orange-600/25 hover:shadow-orange-600/40"
           >
             <Zap size={16} />
             Passer en Pro — Essai 30 jours gratuit

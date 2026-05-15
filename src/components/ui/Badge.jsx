@@ -1,21 +1,21 @@
 const styles = {
   // Devis
   brouillon:    'bg-gray-100 text-gray-700',
-  envoye:       'bg-blue-100 text-blue-700',
+  envoye:       'bg-orange-100 text-orange-700',
   accepte:      'bg-green-100 text-green-700',
   refuse:       'bg-red-100 text-red-700',
   // Chantiers
   en_attente:   'bg-amber-100 text-amber-700',
-  en_cours:     'bg-blue-100 text-blue-700',
+  en_cours:     'bg-orange-100 text-orange-700',
   termine:      'bg-green-100 text-green-700',
   annule:       'bg-gray-100 text-gray-500',
   // Factures
-  envoyee:      'bg-blue-100 text-blue-700',
+  envoyee:      'bg-orange-100 text-orange-700',
   payee:        'bg-green-100 text-green-700',
   en_retard:    'bg-red-100 text-red-700',
   // Véhicules
   disponible:   'bg-green-100 text-green-700',
-  en_service:   'bg-blue-100 text-blue-700',
+  en_service:   'bg-orange-100 text-orange-700',
   maintenance:  'bg-amber-100 text-amber-700',
   hors_service: 'bg-red-100 text-red-700',
 }

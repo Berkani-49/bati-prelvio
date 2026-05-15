@@ -286,7 +286,7 @@ export default function RapportsPage() {
               icon={TrendingUp}
               label="CA devis acceptés"
               value={euro(stats.caAccepte)}
-              color="bg-blue-500"
+              color="bg-orange-500"
               sub={`${stats.nbDevis} devis sur la période`}
             />
             <StatCard
@@ -318,7 +318,7 @@ export default function RapportsPage() {
               <h2 className="text-sm font-semibold text-gray-700">CA mensuel</h2>
               <div className="flex items-center gap-4 text-xs text-gray-500">
                 <span className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded-sm bg-blue-500 inline-block" />
+                  <span className="w-3 h-3 rounded-sm bg-orange-500 inline-block" />
                   Devis acceptés
                 </span>
                 <span className="flex items-center gap-1.5">
@@ -377,7 +377,7 @@ export default function RapportsPage() {
                       <tr key={r.nom} className="hover:bg-gray-50">
                         <td className="px-4 py-2.5 font-medium text-gray-900">{r.nom}</td>
                         <td className="px-4 py-2.5 text-center text-gray-500">{r.jours}</td>
-                        <td className="px-4 py-2.5 text-right font-semibold text-blue-700">{r.heures}</td>
+                        <td className="px-4 py-2.5 text-right font-semibold text-orange-700">{r.heures}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -387,7 +387,7 @@ export default function RapportsPage() {
                       <td className="px-4 py-2.5 text-center text-xs font-semibold text-gray-700">
                         {rows.reduce((s, r) => s + r.jours, 0)}
                       </td>
-                      <td className="px-4 py-2.5 text-right text-xs font-semibold text-blue-700">
+                      <td className="px-4 py-2.5 text-right text-xs font-semibold text-orange-700">
                         {(() => { const t = rows.reduce((s, r) => s + r.min, 0); return `${Math.floor(t / 60)}h${String(t % 60).padStart(2, '0')}` })()}
                       </td>
                     </tr>
@@ -428,7 +428,7 @@ export default function RapportsPage() {
                 }}
                 className="flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
               >
-                <FileDown size={18} className="text-blue-600 shrink-0" />
+                <FileDown size={18} className="text-orange-600 shrink-0" />
                 <div>
                   <p className="text-sm font-medium text-gray-900">Export consolidé</p>
                   <p className="text-xs text-gray-400">Devis + factures sur la période sélectionnée</p>

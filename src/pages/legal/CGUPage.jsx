@@ -115,7 +115,7 @@ export default function CGUPage() {
               Charleroi</strong> seront seuls compétents.
             </p>
             <p className="mt-2">
-              Contact : <a href="mailto:info@prelvio.com" className="text-blue-600">info@prelvio.com</a>
+              Contact : <a href="mailto:info@prelvio.com" className="text-orange-600">info@prelvio.com</a>
             </p>
           </section>
 

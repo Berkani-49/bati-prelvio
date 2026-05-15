@@ -296,7 +296,7 @@ export default function FactureListPage() {
             <Link
               to="/checkout"
               className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                atLimit ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
+                atLimit ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-orange-600 hover:bg-orange-700 text-white'
               }`}
             >
               <Zap size={12} /> {atLimit ? 'Passer en Pro' : 'Passer Pro'}

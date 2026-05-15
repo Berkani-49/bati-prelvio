@@ -19,7 +19,7 @@ export default function ConfidentialitePage() {
             <p>
               Le responsable du traitement de vos données personnelles est <strong>Prelvio</strong>,
               indépendant établi à Charleroi, Belgique.
-              Contact : <a href="mailto:info@prelvio.com" className="text-blue-600">info@prelvio.com</a>
+              Contact : <a href="mailto:info@prelvio.com" className="text-orange-600">info@prelvio.com</a>
             </p>
           </section>
 
@@ -125,19 +125,19 @@ export default function ConfidentialitePage() {
                 ['Droit d\'opposition (Art. 21)', 'Vous opposer à un traitement basé sur l\'intérêt légitime'],
               ].map(([droit, desc]) => (
                 <li key={droit} className="flex gap-3 p-3 bg-gray-50 rounded-lg">
-                  <span className="text-blue-600 font-medium text-sm whitespace-nowrap">{droit}</span>
+                  <span className="text-orange-600 font-medium text-sm whitespace-nowrap">{droit}</span>
                   <span className="text-sm text-gray-600">{desc}</span>
                 </li>
               ))}
             </ul>
             <p className="mt-4">
-              Pour exercer ces droits : <a href="mailto:info@prelvio.com" className="text-blue-600">info@prelvio.com</a>.
+              Pour exercer ces droits : <a href="mailto:info@prelvio.com" className="text-orange-600">info@prelvio.com</a>.
               Nous répondons dans un délai maximum de <strong>30 jours</strong>.
             </p>
             <p className="mt-2 text-sm text-gray-500">
               Vous pouvez également introduire une réclamation auprès de l'
               <strong>APD — Autorité de Protection des Données</strong> (autorité de contrôle belge) :{' '}
-              <a href="https://www.autoriteprotectiondonnees.be" target="_blank" rel="noopener noreferrer" className="text-blue-600">
+              <a href="https://www.autoriteprotectiondonnees.be" target="_blank" rel="noopener noreferrer" className="text-orange-600">
                 autoriteprotectiondonnees.be
               </a>
               {' '}— Rue de la Presse 35, 1000 Bruxelles.
@@ -148,7 +148,7 @@ export default function ConfidentialitePage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-3">7. Contact</h2>
             <p>
               Toute demande relative à vos données personnelles :{' '}
-              <a href="mailto:info@prelvio.com" className="text-blue-600">info@prelvio.com</a>
+              <a href="mailto:info@prelvio.com" className="text-orange-600">info@prelvio.com</a>
             </p>
           </section>
 

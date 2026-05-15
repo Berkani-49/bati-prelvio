@@ -10,7 +10,7 @@ const JOURS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
 const JOURS_LONG = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
 
 const COLORS = [
-  'bg-blue-100 text-blue-800 border-blue-200',
+  'bg-orange-100 text-orange-800 border-orange-200',
   'bg-green-100 text-green-800 border-green-200',
   'bg-violet-100 text-violet-800 border-violet-200',
   'bg-amber-100 text-amber-800 border-amber-200',

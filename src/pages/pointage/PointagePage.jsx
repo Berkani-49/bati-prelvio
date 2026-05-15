@@ -263,7 +263,7 @@ export default function PointagePage() {
                     </td>
                     <td className="px-4 py-3 text-center">
                       {duree
-                        ? <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-xs font-semibold"><Clock size={11} />{duree}</span>
+                        ? <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-50 text-orange-700 rounded-full text-xs font-semibold"><Clock size={11} />{duree}</span>
                         : <span className="text-gray-400">—</span>}
                     </td>
                     <td className="px-4 py-3 text-right">
@@ -346,9 +346,9 @@ export default function PointagePage() {
               </div>
 
               {form.heure_debut && form.heure_fin && (
-                <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 rounded-lg">
-                  <Clock size={14} className="text-blue-600" />
-                  <span className="text-sm text-blue-700 font-medium">
+                <div className="flex items-center gap-2 px-3 py-2 bg-orange-50 rounded-lg">
+                  <Clock size={14} className="text-orange-600" />
+                  <span className="text-sm text-orange-700 font-medium">
                     Durée : {calcHeures(form.heure_debut, form.heure_fin, parseInt(form.pause_min) || 0) || '—'}
                   </span>
                 </div>

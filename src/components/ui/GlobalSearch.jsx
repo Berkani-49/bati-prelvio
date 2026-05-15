@@ -8,7 +8,7 @@ function euro(val) {
 }
 
 const TYPE_CONFIG = {
-  devis:     { icon: FileText, color: 'text-blue-600',   bg: 'bg-blue-50',   label: 'Devis',    path: (id) => `/devis/${id}/edit` },
+  devis:     { icon: FileText, color: 'text-orange-600',   bg: 'bg-orange-50',   label: 'Devis',    path: (id) => `/devis/${id}/edit` },
   chantier:  { icon: HardHat,  color: 'text-teal-600',   bg: 'bg-teal-50',   label: 'Chantier', path: (id) => `/chantiers/${id}` },
   client:    { icon: Users,    color: 'text-violet-600', bg: 'bg-violet-50', label: 'Client',   path: (id) => `/clients` },
   facture:   { icon: Receipt,  color: 'text-green-600',  bg: 'bg-green-50',  label: 'Facture',  path: (id) => `/factures` },

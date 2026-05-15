@@ -305,7 +305,7 @@ export default function ClientsPage() {
                           navigator.clipboard.writeText(url)
                           toast.success('Lien portail copié !')
                         }}
-                        className="p-1.5 rounded hover:bg-blue-50 text-gray-400 hover:text-blue-600"
+                        className="p-1.5 rounded hover:bg-orange-50 text-gray-400 hover:text-orange-600"
                         title="Copier le lien portail client"
                       >
                         <Link2 size={14} />

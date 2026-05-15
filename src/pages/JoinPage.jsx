@@ -61,7 +61,7 @@ export default function JoinPage() {
 
   if (accepting) return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <Loader size={28} className="animate-spin text-blue-600" />
+      <Loader size={28} className="animate-spin text-orange-600" />
     </div>
   )
 
@@ -85,7 +85,7 @@ export default function JoinPage() {
         </div>
         <h1 className="text-xl font-bold text-gray-900 mb-2">Invitation invalide</h1>
         <p className="text-gray-500 text-sm">{error}</p>
-        <Link to="/" className="inline-block mt-4 text-sm text-blue-600 hover:underline">Retour à l'accueil</Link>
+        <Link to="/" className="inline-block mt-4 text-sm text-orange-600 hover:underline">Retour à l'accueil</Link>
       </div>
     </div>
   )
@@ -95,8 +95,8 @@ export default function JoinPage() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 max-w-sm w-full">
         <div className="text-center mb-6">
-          <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-            <Users size={24} className="text-blue-600" />
+          <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <Users size={24} className="text-orange-600" />
           </div>
           <h1 className="text-xl font-bold text-gray-900">Invitation d'équipe</h1>
           <p className="text-gray-500 text-sm mt-1">
@@ -114,7 +114,7 @@ export default function JoinPage() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
-              className="w-full h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
             />
           </div>
           <div>
@@ -125,7 +125,7 @@ export default function JoinPage() {
               onChange={e => setPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
             />
           </div>
 
@@ -134,7 +134,7 @@ export default function JoinPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full py-2.5 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {submitting ? <Loader size={15} className="animate-spin" /> : <LogIn size={15} />}
             {submitting ? 'Chargement…' : mode === 'login' ? 'Se connecter' : 'Créer mon compte'}
@@ -144,11 +144,11 @@ export default function JoinPage() {
         <p className="text-center text-sm text-gray-500 mt-4">
           {mode === 'login' ? (
             <>Pas encore de compte ?{' '}
-              <button onClick={() => setMode('register')} className="text-blue-600 hover:underline font-medium">Créer un compte</button>
+              <button onClick={() => setMode('register')} className="text-orange-600 hover:underline font-medium">Créer un compte</button>
             </>
           ) : (
             <>Déjà un compte ?{' '}
-              <button onClick={() => setMode('login')} className="text-blue-600 hover:underline font-medium">Se connecter</button>
+              <button onClick={() => setMode('login')} className="text-orange-600 hover:underline font-medium">Se connecter</button>
             </>
           )}
         </p>

@@ -309,9 +309,9 @@ export default function ParametresPage() {
         </div>
       </form>
 
-      <div className="card p-5 bg-blue-50 border-blue-100">
-        <p className="text-sm text-blue-800 font-medium mb-1">À savoir</p>
-        <p className="text-sm text-blue-700">Le logo, numéro BCE, email, téléphone et adresse sont utilisés automatiquement sur vos PDF.</p>
+      <div className="card p-5 bg-orange-50 border-orange-100">
+        <p className="text-sm text-orange-800 font-medium mb-1">À savoir</p>
+        <p className="text-sm text-orange-700">Le logo, numéro BCE, email, téléphone et adresse sont utilisés automatiquement sur vos PDF.</p>
       </div>
 
       {/* Section Équipe */}
@@ -384,7 +384,7 @@ export default function ParametresPage() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="section-title">Abonnement</h2>
           {!subLoading && (
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${isPro ? 'bg-blue-50 text-blue-700' : 'bg-gray-100 text-gray-600'}`}>
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${isPro ? 'bg-orange-50 text-orange-700' : 'bg-gray-100 text-gray-600'}`}>
               {isPro ? <Crown size={12} /> : <Zap size={12} />}
               {isPro ? 'Plan Pro' : 'Plan Gratuit'}
             </span>
@@ -412,7 +412,7 @@ export default function ParametresPage() {
             <button
               type="button"
               onClick={() => navigate('/checkout')}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-orange-600 hover:bg-orange-700 rounded-lg transition-colors"
             >
               <Zap size={14} />
               Passer en Pro — 29 €/mois

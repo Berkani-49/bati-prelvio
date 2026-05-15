@@ -115,8 +115,8 @@ export default function LoginPage() {
       <div className="min-h-screen bg-white flex items-center justify-center p-6">
         <div className="text-center max-w-sm">
           <img src="/logo.png" alt="Bati Prelvio" className="w-20 h-20 object-contain mx-auto mb-8" />
-          <div className="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
-            <KeyRound size={26} className="text-blue-600" />
+          <div className="w-14 h-14 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <KeyRound size={26} className="text-orange-600" />
           </div>
           <h2 className="text-xl font-bold text-gray-900 mb-2">Email envoyé !</h2>
           <p className="text-gray-500 text-sm mb-1">
@@ -124,7 +124,7 @@ export default function LoginPage() {
           </p>
           <p className="text-gray-400 text-xs mb-8">Pas reçu ? Vérifiez vos spams.</p>
           <button type="button" onClick={() => switchMode('login')}
-            className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+            className="text-sm text-orange-600 hover:text-orange-800 font-medium">
             ← Retour à la connexion
           </button>
         </div>
@@ -138,8 +138,8 @@ export default function LoginPage() {
       <div className="min-h-screen bg-white flex items-center justify-center p-6">
         <div className="text-center max-w-sm">
           <img src="/logo.png" alt="Bati Prelvio" className="w-20 h-20 object-contain mx-auto mb-8" />
-          <div className="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
-            <MailCheck size={26} className="text-blue-600" />
+          <div className="w-14 h-14 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <MailCheck size={26} className="text-orange-600" />
           </div>
           <h2 className="text-xl font-bold text-gray-900 mb-2">Vérifiez votre email</h2>
           <p className="text-gray-500 text-sm mb-1">
@@ -149,7 +149,7 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => switchMode('login')}
-            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+            className="text-sm text-orange-600 hover:text-orange-800 font-medium"
           >
             ← Retour à la connexion
           </button>
@@ -166,8 +166,8 @@ export default function LoginPage() {
       <div className="hidden lg:flex lg:w-1/2 flex-col bg-[#f8faff] border-r border-gray-100 p-14 relative overflow-hidden">
 
         {/* Cercles déco */}
-        <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-blue-100/60 blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-72 h-72 rounded-full bg-blue-50/80 blur-2xl pointer-events-none" />
+        <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-orange-100/60 blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-72 h-72 rounded-full bg-orange-50/80 blur-2xl pointer-events-none" />
 
         {/* Logo */}
         <div className="relative">
@@ -178,7 +178,7 @@ export default function LoginPage() {
         <div className="relative flex-1 flex flex-col justify-center">
           <h1 className="text-4xl font-extrabold text-gray-900 leading-tight mb-4">
             Gérez vos chantiers<br />
-            <span className="text-blue-600">sans prise de tête.</span>
+            <span className="text-orange-600">sans prise de tête.</span>
           </h1>
           <p className="text-gray-500 text-base leading-relaxed mb-10 max-w-sm">
             L'outil pensé pour les artisans BTP — devis, suivi chantier et facturation en un seul endroit.
@@ -187,7 +187,7 @@ export default function LoginPage() {
           <ul className="space-y-4">
             {features.map((f) => (
               <li key={f} className="flex items-start gap-3">
-                <CheckCircle2 size={18} className="text-blue-500 mt-0.5 shrink-0" />
+                <CheckCircle2 size={18} className="text-orange-500 mt-0.5 shrink-0" />
                 <span className="text-gray-600 text-sm">{f}</span>
               </li>
             ))}
@@ -232,13 +232,13 @@ export default function LoginPage() {
                   placeholder="vous@exemple.fr"
                   autoComplete="email"
                   required
-                  className="w-full h-11 px-4 text-sm bg-white border border-gray-200 hover:border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full h-11 px-4 text-sm bg-white border border-gray-200 hover:border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
                 />
               </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-60 mt-2"
+                className="w-full h-11 bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-60 mt-2"
               >
                 {loading
                   ? <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
@@ -266,7 +266,7 @@ export default function LoginPage() {
                     placeholder="vous@exemple.fr"
                     autoComplete="email"
                     className={`w-full h-11 px-4 text-sm bg-white border rounded-xl transition-colors outline-none
-                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                      focus:ring-2 focus:ring-orange-500 focus:border-orange-500
                       ${errors.email ? 'border-red-400' : 'border-gray-200 hover:border-gray-300'}`}
                     {...register('email')}
                   />
@@ -284,7 +284,7 @@ export default function LoginPage() {
                       <button
                         type="button"
                         onClick={() => switchMode('forgot')}
-                        className="text-xs text-blue-600 hover:text-blue-800 transition-colors"
+                        className="text-xs text-orange-600 hover:text-orange-800 transition-colors"
                       >
                         Mot de passe oublié ?
                       </button>
@@ -295,7 +295,7 @@ export default function LoginPage() {
                     placeholder="••••••••"
                     autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                     className={`w-full h-11 px-4 text-sm bg-white border rounded-xl transition-colors outline-none
-                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                      focus:ring-2 focus:ring-orange-500 focus:border-orange-500
                       ${errors.password ? 'border-red-400' : 'border-gray-200 hover:border-gray-300'}`}
                     {...register('password')}
                   />
@@ -310,7 +310,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={loading || cooldown > 0}
-                  className="w-full h-11 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed mt-2"
+                  className="w-full h-11 bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed mt-2"
                 >
                   {loading ? (
                     <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
@@ -332,8 +332,8 @@ export default function LoginPage() {
                   className="text-sm text-gray-500 hover:text-gray-800 transition-colors"
                 >
                   {mode === 'login'
-                    ? <>Pas encore de compte ? <span className="text-blue-600 font-medium">S'inscrire</span></>
-                    : <>Déjà un compte ? <span className="text-blue-600 font-medium">Se connecter</span></>
+                    ? <>Pas encore de compte ? <span className="text-orange-600 font-medium">S'inscrire</span></>
+                    : <>Déjà un compte ? <span className="text-orange-600 font-medium">Se connecter</span></>
                   }
                 </button>
               </div>

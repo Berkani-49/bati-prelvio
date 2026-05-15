@@ -15,7 +15,7 @@ function StatutBadge({ statut }) {
   const cfg = {
     brouillon:  { label: 'Brouillon',   cls: 'bg-gray-100 text-gray-600' },
     envoye:     { label: 'En attente',  cls: 'bg-amber-100 text-amber-700' },
-    envoyee:    { label: 'Émise',       cls: 'bg-blue-100 text-blue-700' },
+    envoyee:    { label: 'Émise',       cls: 'bg-orange-100 text-orange-700' },
     accepte:    { label: 'Accepté',     cls: 'bg-green-100 text-green-700' },
     refuse:     { label: 'Refusé',      cls: 'bg-red-100 text-red-700' },
     payee:      { label: 'Payée',       cls: 'bg-green-100 text-green-700' },
@@ -138,8 +138,8 @@ export default function PortailClientPage() {
         {/* Infos client */}
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-              <span className="text-blue-700 font-bold text-sm">{client.nom.slice(0, 2).toUpperCase()}</span>
+            <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
+              <span className="text-orange-700 font-bold text-sm">{client.nom.slice(0, 2).toUpperCase()}</span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-gray-900">{client.nom}</p>
@@ -205,7 +205,7 @@ export default function PortailClientPage() {
                 <div className="text-right shrink-0">
                   <p className="font-bold text-gray-900">{euro(d.total_ttc)}</p>
                   <button onClick={() => downloadDevisPDF(d)} disabled={downloading === d.id}
-                    className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 mt-1 disabled:opacity-50">
+                    className="flex items-center gap-1 text-xs text-orange-600 hover:text-orange-800 mt-1 disabled:opacity-50">
                     <Download size={11} />{downloading === d.id ? 'PDF…' : 'PDF'}
                   </button>
                 </div>
@@ -238,7 +238,7 @@ export default function PortailClientPage() {
                 <div className="text-right shrink-0">
                   <p className="font-bold text-gray-900">{euro(f.total_ttc)}</p>
                   <button onClick={() => downloadFacturePDF(f)} disabled={downloading === f.id}
-                    className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 mt-1 disabled:opacity-50">
+                    className="flex items-center gap-1 text-xs text-orange-600 hover:text-orange-800 mt-1 disabled:opacity-50">
                     <Download size={11} />{downloading === f.id ? 'PDF…' : 'PDF'}
                   </button>
                 </div>

@@ -43,7 +43,7 @@ export default function ResetPasswordPage() {
   if (!ready) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-3 bg-gray-50">
-        <span className="w-7 h-7 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <span className="w-7 h-7 border-2 border-orange-600 border-t-transparent rounded-full animate-spin" />
         <p className="text-sm text-gray-400">Vérification du lien…</p>
       </div>
     )
@@ -54,8 +54,8 @@ export default function ResetPasswordPage() {
       <div className="w-full max-w-sm">
         <img src="/logo.png" alt="Bati Prelvio" className="w-16 h-16 object-contain mx-auto mb-8" />
 
-        <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
-          <KeyRound size={22} className="text-blue-600" />
+        <div className="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-6">
+          <KeyRound size={22} className="text-orange-600" />
         </div>
 
         <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">Nouveau mot de passe</h2>
@@ -71,7 +71,7 @@ export default function ResetPasswordPage() {
               placeholder="••••••••"
               autoComplete="new-password"
               required
-              className="w-full h-11 px-4 text-sm bg-white border border-gray-200 hover:border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full h-11 px-4 text-sm bg-white border border-gray-200 hover:border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
             />
           </div>
 
@@ -84,14 +84,14 @@ export default function ResetPasswordPage() {
               placeholder="••••••••"
               autoComplete="new-password"
               required
-              className="w-full h-11 px-4 text-sm bg-white border border-gray-200 hover:border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full h-11 px-4 text-sm bg-white border border-gray-200 hover:border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-60 mt-2"
+            className="w-full h-11 bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-60 mt-2"
           >
             {loading
               ? <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
